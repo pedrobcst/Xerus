@@ -1,0 +1,8 @@
+Created 2020-12-28T14:17:54.780675 on pop-vm.aps.anl.gov
+Built with Jeeves from Build_Mac_py3.8 from G2 version 4228 on mac mac-1
+ProductName:	Mac OS X
+ProductVersion:	10.14.6
+BuildVersion:	18G6032
+python                    3.8.5                h26836e1_1  
+numpy                     1.19.2           py38h456fd55_0  
+gfortran_osx-64           4.8.5                h22b1bf0_8  

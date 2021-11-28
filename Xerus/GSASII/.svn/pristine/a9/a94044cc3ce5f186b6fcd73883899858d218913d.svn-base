@@ -1,0 +1,6 @@
+Created 2020-12-20T17:13:05.766319 on webvm-j1.aps.anl.gov
+Built with Jeeves from Build_Linux64_py3.8 from G2 version 4228 on linux64 master
+Red Hat Enterprise Linux Server release 7.9 (Maipo)
+python                    3.8.5                h7579374_1  
+numpy                     1.19.2           py38h54aff64_0  
+gfortran_linux-64         7.3.0                h553295d_9  
