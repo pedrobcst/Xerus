@@ -5,6 +5,11 @@ XERUS (X-Ray Estimation and Refinement Using Similarity)
 ========================================================
 ![img](img/g163.png)
 
+Paper
+====
+This is the main repository for
+  * XERUS: arXiv
+
 Introduction
 ============
 Welcome to the _Xerus_ project. Xerus is an open-source python wrapper / plugin around the GSASII Scriptable package,
