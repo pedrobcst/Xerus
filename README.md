@@ -8,7 +8,7 @@ XERUS (X-Ray Estimation and Refinement Using Similarity)
 Paper
 ====
 This is the main repository for
-  * XERUS: arXiv
+  * Pedro Baptista de Castro, Kensei Terashima, Miren Garbiñe Esparza Echevarría, Hiroyuki Takeya, Yoshihiko Takano (2021). "XERUS: An open-source tool for quick XRD phase identification and refinement automation" arXiv:2112.04773, https://arxiv.org/abs/2112.04773
 
 Introduction
 ============
@@ -119,7 +119,7 @@ If all tests sucessfuly pass, _Xerus_ should be ready for use.
 If you use _Xerus_ please __also__ cite the following papers:
 
 * If you use only phase matching:
-  * XERUS: arXiv
+  * Pedro Baptista de Castro, Kensei Terashima, Miren Garbiñe Esparza Echevarría, Hiroyuki Takeya, Yoshihiko Takano (2021). "XERUS: An open-source tool for quick XRD phase identification and refinement automation" arXiv:2112.04773, https://arxiv.org/abs/2112.04773
   * Toby, B. H., & Von Dreele, R. B. (2013). "GSAS-II: the genesis of a modern open-source all purpose crystallography software package". Journal of Applied Crystallography, 46(2), 544-549. ​doi:10.1107/S0021889813003531
 
 
