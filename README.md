@@ -71,7 +71,7 @@ conda create -n Xerus python==3.8 anaconda
 conda activate Xerus
 git clone http://www.github.com/pedrobcst/Xerus/
 cd Xerus
-pip install -r requeriments.txt
+pip install -r requirements.txt
 ```
 
 
