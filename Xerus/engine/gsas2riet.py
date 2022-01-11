@@ -122,8 +122,8 @@ def simulate_pattern(filename: str, instr_params:str = INSTR_PARAMS, tmin: float
         if y.std() < threshold:
             status = -1
     except (KeyError, IndexError) as e:
-        return -1, gpx  
-    return 1, " "
+        return -1  
+    return 1
 
 
 def run_gsas_mp2(powder_data: str, cifs: Tuple[str], phasenames: Tuple[str], outfolder: str,
