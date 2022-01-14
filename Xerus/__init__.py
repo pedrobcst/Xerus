@@ -22,7 +22,10 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__)))) + os.sep  # so convoluted..
+
+project_path = (
+    str(Path(os.path.dirname(os.path.realpath(__file__)))) + os.sep
+)  # so convoluted..
 if project_path not in sys.path:
     sys.path.append(project_path)
 import numpy as np
@@ -32,19 +35,31 @@ from typing import List, Tuple, Any, Union
 from multiprocessing import Pool
 from pymatgen import Composition
 from Xerus.db.localdb import LocalDB
-from Xerus.utils.tools import group_data, normalize_formula, make_offset, blockPrinting, save_json, load_json, \
-    create_folder
+from Xerus.utils.tools import (
+    group_data,
+    normalize_formula,
+    make_offset,
+    blockPrinting,
+    save_json,
+    load_json,
+    create_folder,
+)
 from Xerus.utils.tools import plotly_add as to_add
 from Xerus.utils.cifutils import make_system_types, make_system
 from Xerus.readers.datareader import DataReader
 from Xerus.settings.settings import GSAS2_BIN, INSTR_PARAMS
-from Xerus.similarity.pattern_removal import run_correlation_analysis, combine_pos, run_correlation_analysis_riet
+from Xerus.similarity.pattern_removal import (
+    run_correlation_analysis,
+    combine_pos,
+    run_correlation_analysis_riet,
+)
 from Xerus.similarity.visualization import make_plot_all, make_plot_step
 from Xerus.engine.gsas2viz import plot_all_gpx, plot_gpx
 from Xerus.engine.gsas2wrap import GSASRefiner
 from Xerus.engine.gsas2riet import simulate_spectra, refine_comb
 from Xerus.engine.gsas2utils import make_gpx
 from Xerus.utils.preprocessing import remove_baseline, standarize_intensity
+
 
 class XRay:
     """
@@ -74,24 +89,27 @@ class XRay:
 
     """
 
-    def __init__(self,
-                 name: str,
-                 working_folder: str,
-                 elements: List[str],
-                 exp_data_file: str,
-                 data_fmt: str = "auto",
-                 maxsys: Union[Any, float] = None,
-                 max_oxy: int = 2,
-                 remove_background: bool = False,
-                 poly_degree: int = 8,
-                 standarize_int: bool = True,
-                 use_preprocessed: bool = True):
+    def __init__(
+        self,
+        name: str,
+        working_folder: str,
+        elements: List[str],
+        exp_data_file: str,
+        data_fmt: str = "auto",
+        maxsys: Union[Any, float] = None,
+        max_oxy: int = 2,
+        remove_background: bool = False,
+        poly_degree: int = 8,
+        standarize_int: bool = True,
+        use_preprocessed: bool = True,
+    ):
 
         if data_fmt == "auto":
             data_fmt = exp_data_file.split(".")[-1].lower()
             print(f"No datafmt passed. Assuming its {data_fmt}")
-        self.exp_data, self.tmin, self.tmax, self.step = DataReader().read_data(exp_data_file,
-                                                                                data_fmt)  # Read up the data
+        self.exp_data, self.tmin, self.tmax, self.step = DataReader().read_data(
+            exp_data_file, data_fmt
+        )  # Read up the data
         self.standarize = standarize_int
         self.datafmt = data_fmt
         self.rb = remove_background
@@ -99,7 +117,7 @@ class XRay:
         self.exp_data_file = exp_data_file
         self.name = name
         self.working_folder = working_folder  # Set up working folder
-        create_folder(working_folder) # Create folder if doest not exist.
+        create_folder(working_folder)  # Create folder if doest not exist.
         self.elements = elements  # Set up elements
         self.instr_params = INSTR_PARAMS  # Instr params from your xrday machines
         self.filename = os.path.basename(exp_data_file)
@@ -126,13 +144,13 @@ class XRay:
 
         # Check up Preprocessing
         if standarize_int:
-            print('Standarizing intensity to [0,1]..')
+            print("Standarizing intensity to [0,1]..")
             self.exp_data = standarize_intensity(self.exp_data)
         if use_preprocessed:
             preprocess_name = f"{self.filename.split('.')[0]}_preprocessed.csv"
             self._preprocess_path = os.path.join(self.working_folder, preprocess_name)
             export_data = self.exp_data.copy()
-            export_data.drop(['filename'], axis=1, inplace=True)
+            export_data.drop(["filename"], axis=1, inplace=True)
             export_data.to_csv(self._preprocess_path, index=False, header=False)
             self._old_data = self.exp_data_file
             self._old_fmt = self.datafmt
@@ -140,7 +158,10 @@ class XRay:
 
         if remove_background:
             print(f"Removing background using polynomial degree: {poly_degree}")
-            self.exp_data = remove_baseline(self.exp_data, poly_degree=poly_degree, plot=True)
+            self.exp_data = remove_baseline(
+                self.exp_data, poly_degree=poly_degree, plot=True
+            )
+
         @property
         def rwp(self):
             if self._rwp_best is not None:
@@ -192,9 +213,12 @@ class XRay:
 
         self.corrinfo = None  ## :)
 
-    def get_cifs(self, ignore_provider: List[str] = None,
-                 ignore_comb: List[str] = None,
-                 ignore_ids: List[str] = None) -> XRay:
+    def get_cifs(
+        self,
+        ignore_provider: List[str] = None,
+        ignore_comb: List[str] = None,
+        ignore_ids: List[str] = None,
+    ) -> XRay:
         """
         Get cifs from MongoDB and write to working folder.
         If a certain combination of elements CIF is not present, it will automatically download
@@ -209,10 +233,12 @@ class XRay:
         -------
         self
         """
-        cif_meta, cif_notran, cif_notsim = LocalDB().get_cifs_and_write(element_list=self.elements,
-                                                                             outfolder=self.working_folder,
-                                                                             maxn=self.maxsys,
-                                                                             max_oxy=self.max_oxy)
+        cif_meta, cif_notran, cif_notsim = LocalDB().get_cifs_and_write(
+            element_list=self.elements,
+            outfolder=self.working_folder,
+            maxn=self.maxsys,
+            max_oxy=self.max_oxy,
+        )
         self.cif_info = cif_meta
         if ignore_provider is not None:
             self.cif_info = self.cif_info[~self.cif_info.provider.isin(ignore_provider)]
@@ -231,9 +257,15 @@ class XRay:
         self.cif_notran = cif_notran
         self.cif_notsim = cif_notsim
         folder = self.working_folder
-        name_out_cif = os.path.join(folder, os.path.normpath(folder).replace(os.sep, "_") + '_all_cifs.csv')
-        name_out_notran = os.path.join(folder, os.path.normpath(folder).replace(os.sep, "_") + '_not_used_riet.csv')
-        name_out_notsim = os.path.join(folder, os.path.normpath(folder).replace(os.sep, "_") + '_not_used_sim.csv')
+        name_out_cif = os.path.join(
+            folder, os.path.normpath(folder).replace(os.sep, "_") + "_all_cifs.csv"
+        )
+        name_out_notran = os.path.join(
+            folder, os.path.normpath(folder).replace(os.sep, "_") + "_not_used_riet.csv"
+        )
+        name_out_notsim = os.path.join(
+            folder, os.path.normpath(folder).replace(os.sep, "_") + "_not_used_sim.csv"
+        )
 
         self.cif_info.to_csv(name_out_cif, index=False)
         self.cif_notran.to_csv(name_out_notran, index=False)
@@ -253,7 +285,7 @@ class XRay:
         """
         if n_jobs > os.cpu_count():
             n_jobs = os.cpu_count()
-        elif n_jobs == - 1:
+        elif n_jobs == -1:
             n_jobs = None
 
         tmin = self.tmin
@@ -264,27 +296,35 @@ class XRay:
         working_folder = self.working_folder
         instr_params = self.instr_params
         print("Simulating {} patterns".format(len(ciflist)))
-        args = [[f] + [tmin, tmax, step, working_folder, instr_params] for f in ciflist.full_path]
+        args = [
+            [f] + [tmin, tmax, step, working_folder, instr_params]
+            for f in ciflist.full_path
+        ]
         with Pool(processes=n_jobs) as p:
             paths = p.starmap(simulate_spectra, args)
             p.close()
             p.join()
         print("Done. Cleaning up GSASII files.")
         # Clean up
-        files = [file for file in os.listdir(os.getcwd()) if file.endswith(".gpx") or file.endswith(".lst")]
+        files = [
+            file
+            for file in os.listdir(os.getcwd())
+            if file.endswith(".gpx") or file.endswith(".lst")
+        ]
         for file in files:
             # print(f"Cleaning up {file}")
             os.remove(file)
-        ciflist['simulated_files'] = [r[0] for r in paths]
-        ciflist['simulated_reflects'] = [r[1] for r in paths]
-        ciflist['sm_ran'] = [r[2] for r in paths]
-        ciflist = ciflist[ciflist['sm_ran']]
-        ciflist.drop(['sm_ran'], axis=1, inplace=True)
+        ciflist["simulated_files"] = [r[0] for r in paths]
+        ciflist["simulated_reflects"] = [r[1] for r in paths]
+        ciflist["sm_ran"] = [r[2] for r in paths]
+        ciflist = ciflist[ciflist["sm_ran"]]
+        ciflist.drop(["sm_ran"], axis=1, inplace=True)
         ciflist.reset_index(drop=True, inplace=True)
-        ciflist = pd.DataFrame(ciflist.to_records(index=False))  # convert back to a pandas df
+        ciflist = pd.DataFrame(
+            ciflist.to_records(index=False)
+        )  # convert back to a pandas df
         self.cif_info = ciflist.copy()
         return self
-
 
     def _read_simulations(self) -> XRay:
         """
@@ -296,35 +336,41 @@ class XRay:
         reflections = []
         simulations = []
         for sim, ref, spg, spgnum, cs, name, provider, mid, fname, cij in zip(
-                self.cif_info['simulated_files'],
-                self.cif_info['simulated_reflects'],
-                self.cif_info['spacegroup'],
-                self.cif_info['spacegroup_number'],
-                self.cif_info['crystal_system'],
-                self.cif_info['name'],
-                self.cif_info['provider'],
-                self.cif_info['id'],
-                self.cif_info['filename'],
-                self.cif_info['Cij']):
-            if spg != 'None':
+            self.cif_info["simulated_files"],
+            self.cif_info["simulated_reflects"],
+            self.cif_info["spacegroup"],
+            self.cif_info["spacegroup_number"],
+            self.cif_info["crystal_system"],
+            self.cif_info["name"],
+            self.cif_info["provider"],
+            self.cif_info["id"],
+            self.cif_info["filename"],
+            self.cif_info["Cij"],
+        ):
+            if spg != "None":
                 sim_data = pd.read_csv(sim)
                 ref_data = pd.read_csv(ref)
-                sim_data['name'] = name
-                sim_data['provider'] = provider
-                sim_data['mid'] = mid
-                sim_data['filename'] = fname
-                sim_data['spacegroup'] = spg
-                sim_data['spacegroup_number'] = spgnum
-                sim_data['crystal_system'] = cs
-                sim_data['Cij'] = cij
+                sim_data["name"] = name
+                sim_data["provider"] = provider
+                sim_data["mid"] = mid
+                sim_data["filename"] = fname
+                sim_data["spacegroup"] = spg
+                sim_data["spacegroup_number"] = spgnum
+                sim_data["crystal_system"] = cs
+                sim_data["Cij"] = cij
                 reflections.append(ref_data)
                 simulations.append((sim_data, fname))
         self.simulated_gsas2 = simulations
         self.reflections_gsas2 = reflections
         return self
 
-    def select_cifs(self, cif_info: Union[pd.DataFrame, str] = "auto", save: bool = True,
-                    normalize: bool = True, by_systemtype: bool = True) -> pd.DataFrame:
+    def select_cifs(
+        self,
+        cif_info: Union[pd.DataFrame, str] = "auto",
+        save: bool = True,
+        normalize: bool = True,
+        by_systemtype: bool = True,
+    ) -> pd.DataFrame:
         """
         Filter CIFs by correlation plus either stoichiometry + spacegroup or by system type + spacegroup.
         This method is done so, we avoid using alot of patterns of the same structure when searching for phases.
@@ -366,16 +412,18 @@ class XRay:
 
         if not by_systemtype:
             if not normalize:
-                dfs = group_data(cif_info, column_name=['name', 'spacegroup_number'])
+                dfs = group_data(cif_info, column_name=["name", "spacegroup_number"])
             else:
 
-                cif_info['normalized_formula'] = cif_info.name.apply(normalize_formula)
-                dfs = group_data(cif_info, column_name=['normalized_formula', 'spacegroup_number'])
+                cif_info["normalized_formula"] = cif_info.name.apply(normalize_formula)
+                dfs = group_data(
+                    cif_info, column_name=["normalized_formula", "spacegroup_number"]
+                )
         else:
             dfs = group_data(cif_info, column_name=["system_type", "spacegroup_number"])
         chid = []
         for df in dfs:
-            df.sort_values(by='Cij', ascending=False, inplace=True)
+            df.sort_values(by="Cij", ascending=False, inplace=True)
             # Get the id corresponding to the highest correlated.
             # Here we are hoping that those patterns are all the same (fingers-crossed)
             material_id = df.id.iat[0]
@@ -389,7 +437,9 @@ class XRay:
         else:
             return df_
 
-    def calculate_correlations(self, select_cifs: bool = True, by_sys: bool = True) -> str:
+    def calculate_correlations(
+        self, select_cifs: bool = True, by_sys: bool = True
+    ) -> str:
         """
         Calculate correlations between experimental data and obtained crystal structures
         Parameters
@@ -405,41 +455,54 @@ class XRay:
         """
 
         exp_data = self.exp_data.copy()
-        df_data = [exp_data.loc[:, 'int']]
+        df_data = [exp_data.loc[:, "int"]]
         filenames = [os.path.basename(self.exp_data.filename.iat[0])]
         self.cif_info.reset_index(drop=True, inplace=True)
-        for path in self.cif_info.loc[:, 'simulated_files']:
-            df_data.append(pd.read_csv(path).loc[:, 'int'])
+        for path in self.cif_info.loc[:, "simulated_files"]:
+            df_data.append(pd.read_csv(path).loc[:, "int"])
             filenames.append(os.path.basename(path))
         intensities = pd.concat(df_data, axis=1)  # concat intensities
         intensities.dropna(inplace=True)  # drop anyna just incase
         intensities.columns = filenames  # set the columns for filenames
         Cij = intensities.corr()
         Cij_ = Cij.iloc[1:, 0]
-        self.cif_info['Cij'] = np.array(Cij_)
+        self.cif_info["Cij"] = np.array(Cij_)
 
         # Try to filter out "same" CIFs (otherwise we just get a bunch of high Cij from the same phase)
         if select_cifs:
-            self.cif_info = self.select_cifs(save=False, normalize=True, by_systemtype=by_sys)
+            self.cif_info = self.select_cifs(
+                save=False, normalize=True, by_systemtype=by_sys
+            )
         folder = self.working_folder
-        name_out = os.path.join(folder, os.path.normpath(folder).replace(os.sep, "_") + '_Correlations_run_1.csv')
+        name_out = os.path.join(
+            folder,
+            os.path.normpath(folder).replace(os.sep, "_") + "_Correlations_run_1.csv",
+        )
         # Export already sorted
-        self.cif_info.sort_values(by='Cij', ascending=False).to_csv(name_out)
-        print(f"""Highest Correlated pattern is {self.cif_info.sort_values(by='Cij', ascending=False).name.iat[0]}, with Cij: {self.cif_info.sort_values(by='Cij', ascending=False).Cij.iat[0]}""")
+        self.cif_info.sort_values(by="Cij", ascending=False).to_csv(name_out)
+        print(
+            f"""Highest Correlated pattern is {self.cif_info.sort_values(by='Cij', ascending=False).name.iat[0]}, with Cij: {self.cif_info.sort_values(by='Cij', ascending=False).Cij.iat[0]}"""
+        )
         self.corrinfo = name_out
         return name_out
 
-
-    def analyze(self, n_runs: Any[int, str] = "auto", grabtop: int = 3, delta: float = 1.3, combine_filter: bool = False,
-                select_cifs: bool = True, plot_all: bool = False,
-                ignore_provider: List[str] = ["AFLOW"],
-                ignore_comb: List[str] = None,
-                ignore_ids: List[str] = None,
-                solver: str = "box",
-                group_method: str = "system_type",
-                auto_threshold: int = 10,
-                r_ori: bool = False,
-                n_jobs: int = -1) -> pd.DataFrame:
+    def analyze(
+        self,
+        n_runs: Any[int, str] = "auto",
+        grabtop: int = 3,
+        delta: float = 1.3,
+        combine_filter: bool = False,
+        select_cifs: bool = True,
+        plot_all: bool = False,
+        ignore_provider: Tuple[str] = ("AFLOW"),
+        ignore_comb: List[str] = None,
+        ignore_ids: List[str] = None,
+        solver: str = "box",
+        group_method: str = "system_type",
+        auto_threshold: int = 10,
+        r_ori: bool = False,
+        n_jobs: int = -1,
+    ) -> pd.DataFrame:
         """
         Search for possible phases in a experimental pattern given the possible elements
         Parameters
@@ -469,7 +532,7 @@ class XRay:
         if n_jobs == -1:
             n_jobs = os.cpu_count()
 
-        if solver not in ['box', 'rietveld']:
+        if solver not in ["box", "rietveld"]:
             raise ValueError
         if group_method not in ["system_type", "stoich"]:
             raise ValueError
@@ -480,7 +543,9 @@ class XRay:
         if self.use_preprocessed:
             self.exp_data_file = self._preprocess_path
             self.datafmt = "csv"
-            print(f"Using preprocessed data {self._preprocess_path}. New datafmt is: {self.datafmt}")
+            print(
+                f"Using preprocessed data {self._preprocess_path}. New datafmt is: {self.datafmt}"
+            )
 
         if n_runs == "auto":
             auto = True
@@ -489,9 +554,13 @@ class XRay:
             auto = False
 
         # Get the cifs, simulate the patterns, run correlation (first phase)
-        self.get_cifs(ignore_provider=ignore_provider,
-                      ignore_comb=ignore_comb, ignore_ids=ignore_ids).simulate_all(n_jobs=n_jobs).calculate_correlations(select_cifs=select_cifs, by_sys=systype)
-
+        self.get_cifs(
+            ignore_provider=ignore_provider,
+            ignore_comb=ignore_comb,
+            ignore_ids=ignore_ids,
+        ).simulate_all(n_jobs=n_jobs).calculate_correlations(
+            select_cifs=select_cifs, by_sys=systype
+        )
 
         # Plot highest correlated first.
         self.plot_highest_correlated()
@@ -499,7 +568,10 @@ class XRay:
 
         if solver == "rietveld":
             if n_runs == "auto":
-                raise (NotImplementedError, "n_runs = `auto` not available for residual method.")
+                raise (
+                    NotImplementedError,
+                    "n_runs = `auto` not available for residual method.",
+                )
             runs, topn, topnfilter = run_correlation_analysis_riet(
                 experimental_data=self.exp_data_file,
                 patterns_data=self.cif_info,
@@ -507,73 +579,90 @@ class XRay:
                 datafmt=self.datafmt,
                 grabtop=grabtop,
                 working_folder=self.working_folder,
-                allow_ori=r_ori
+                allow_ori=r_ori,
             )
 
         else:
             runs, topn, topnfilter = run_correlation_analysis(
-            experimental_data=self.exp_data_file,
-            patterns_data=self.cif_info,
-            delta=delta,
-            number_of_runs=n_runs,
-            auto=auto,
-            datafmt=self.datafmt,
-            grabtop=grabtop,
-            working_folder=self.working_folder,
-            remove_background=self.rb,
-            poly_degree=self.pd,
-            auto_threshold=auto_threshold
-        )
+                experimental_data=self.exp_data_file,
+                patterns_data=self.cif_info,
+                delta=delta,
+                number_of_runs=n_runs,
+                auto=auto,
+                datafmt=self.datafmt,
+                grabtop=grabtop,
+                working_folder=self.working_folder,
+                remove_background=self.rb,
+                poly_degree=self.pd,
+                auto_threshold=auto_threshold,
+            )
             if auto:
                 n_runs = len(runs)
 
         topnfilter = [pd.DataFrame(data) for data in topnfilter]
         if n_runs == 1:
             df_final = topn[0]
-            df_final['gpx_path'] = df_final.apply(lambda row: make_gpx(row['name'], row.spacegroup, row.full_path),
-                                                  axis=1)
-            df_final.sort_values(by='rwp', inplace=True)
+            df_final["gpx_path"] = df_final.apply(
+                lambda row: make_gpx(row["name"], row.spacegroup, row.full_path), axis=1
+            )
+            df_final.sort_values(by="rwp", inplace=True)
             df_final.reset_index(drop=True, inplace=True)
-            df_final.to_csv(os.path.join(self.working_folder, "Refinement Results.csv"), index=False)
-            df_final.drop(['bragg'],axis=1, inplace=True)
+            df_final.to_csv(
+                os.path.join(self.working_folder, "Refinement Results.csv"), index=False
+            )
+            df_final.drop(["bragg"], axis=1, inplace=True)
             print("Analysis complete")
-            best_rwp = df_final['rwp'].iat[0]
-            best_gpx = df_final['gpx_path'].iat[0]
-            best_cifs = df_final['filename'].iat[0]
+            best_rwp = df_final["rwp"].iat[0]
+            best_gpx = df_final["gpx_path"].iat[0]
+            best_cifs = df_final["filename"].iat[0]
             print(f"Best result {best_cifs}, Rwp: {best_rwp:.2f}%")
             self.rwp = best_rwp
             self.gpx_best = best_gpx
             self.cifs_best = best_cifs
             self.results = df_final
             self.plot_result(0, engine="plotly", mode="simul", save=True)
-            print(f"Saved final plot result as {os.path.basename(best_gpx).replace('gpx', 'html')}")
+            print(
+                f"Saved final plot result as {os.path.basename(best_gpx).replace('gpx', 'html')}"
+            )
         else:
 
             make_plot_all(runs, topn, self.name, self.working_folder)
             make_plot_step(runs, topn, self.name, self.working_folder, solver=solver)
             if solver == "box":
-                make_plot_step(runs, topnfilter, self.name + "_filter", self.working_folder)
+                make_plot_step(
+                    runs, topnfilter, self.name + "_filter", self.working_folder
+                )
 
                 # In case of using "filter" option (remove structure that has already appeared in n-k run, k > 0
                 if combine_filter:
-                    trials = combine_pos(top_patterns=topnfilter
-                                         )
+                    trials = combine_pos(top_patterns=topnfilter)
                 else:
                     trials = combine_pos(top_patterns=topn)
                     # If dont use filter, attempt to clean up repeated runs and runs with same structure.
                     aux_df = pd.DataFrame(trials)
                     # Get ids from each combination (id is a unique identifier of structure of each database)
-                    aux_df['ids'] = aux_df.comb.apply(lambda comb: [dic['id'] for dic in comb])
+                    aux_df["ids"] = aux_df.comb.apply(
+                        lambda comb: [dic["id"] for dic in comb]
+                    )
                     # Remove ids where there is more than the same id in the list
                     aux_clean = aux_df[
-                        aux_df.ids.apply(lambda lst: all([lst.count(element) == 1 for element in lst]))].copy()
+                        aux_df.ids.apply(
+                            lambda lst: all(
+                                [lst.count(element) == 1 for element in lst]
+                            )
+                        )
+                    ].copy()
                     # Clean up now runs that are identical
-                    aux_clean['ids_str'] = aux_clean['ids'].apply(lambda lst: ",".join(lst))
+                    aux_clean["ids_str"] = aux_clean["ids"].apply(
+                        lambda lst: ",".join(lst)
+                    )
                     aux_clean.drop_duplicates(subset="ids_str", inplace=True)
                     aux_clean.reset_index(drop=True, inplace=True)
-                    print(f"Removed {len(aux_df) - len(aux_clean)} repeated combinations.")
+                    print(
+                        f"Removed {len(aux_df) - len(aux_clean)} repeated combinations."
+                    )
                     # Remove it
-                    aux_clean.drop(['ids', 'ids_str'], axis=1, inplace=True)
+                    aux_clean.drop(["ids", "ids_str"], axis=1, inplace=True)
 
             if solver == "box":
                 # Set up the dataframe to refine the patterns in parallel using modin
@@ -595,8 +684,8 @@ class XRay:
                     p.join()
 
                 # Parse results and report.
-                to_run['rwp'] = [r['rwp'] for r in result]
-                to_run['wt'] = [r['wt'] for r in result]
+                to_run["rwp"] = [r["rwp"] for r in result]
+                to_run["wt"] = [r["wt"] for r in result]
                 outpath = os.path.join(self.working_folder, "trials_result.json")
                 to_run.sort_values(by="rwp", inplace=True)
                 trials = to_run.to_dict(orient="records")
@@ -605,10 +694,12 @@ class XRay:
                 save_json(trials, outpath)
 
                 # Load first run from correction analysis and concatenate all
-                first_trial = load_json(os.path.join(self.working_folder, "first_run.json"))
+                first_trial = load_json(
+                    os.path.join(self.working_folder, "first_run.json")
+                )
                 first_df = pd.DataFrame(first_trial)
-                first_df['nruns'] = 1
-                first_df['pos'] = 1
+                first_df["nruns"] = 1
+                first_df["pos"] = 1
                 trials_df = pd.DataFrame(trials)
                 df_list = []
                 # aggregation of data for final report
@@ -617,53 +708,76 @@ class XRay:
                     for k, v in adict[0].items():
                         newdict[k] = [[x[k] for x in adict]]
                     df_ = pd.DataFrame(newdict)
-                    df_['rwp'] = rwp
-                    df_['wt'] = [wt]
-                    df_['nruns'] = len(wt)
+                    df_["rwp"] = rwp
+                    df_["wt"] = [wt]
+                    df_["nruns"] = len(wt)
                     df_list.append(df_)
 
                 # Setup final dataframe.
                 df_final = pd.concat([first_df] + df_list)
-                df_final['gpx_path'] = df_final.apply(lambda row: make_gpx(row['name'], row.spacegroup, row.full_path),
-                                                      axis=1)
-                df_final.sort_values(by='rwp', inplace=True)
+                df_final["gpx_path"] = df_final.apply(
+                    lambda row: make_gpx(row["name"], row.spacegroup, row.full_path),
+                    axis=1,
+                )
+                df_final.sort_values(by="rwp", inplace=True)
                 df_final.reset_index(drop=True, inplace=True)
-                df_final.to_csv(os.path.join(self.working_folder, "Refinement Results.csv"), index=False)
+                df_final.to_csv(
+                    os.path.join(self.working_folder, "Refinement Results.csv"),
+                    index=False,
+                )
                 print("Analysis complete")
-                best_rwp = df_final['rwp'].iat[0]
-                best_gpx = df_final['gpx_path'].iat[0]
-                best_cifs = df_final['filename'].iat[0]
-                print("Best combination: {}, Rwp: {}%".format('_'.join(best_cifs), best_rwp))
+                best_rwp = df_final["rwp"].iat[0]
+                best_gpx = df_final["gpx_path"].iat[0]
+                best_cifs = df_final["filename"].iat[0]
+                print(
+                    "Best combination: {}, Rwp: {}%".format(
+                        "_".join(best_cifs), best_rwp
+                    )
+                )
 
             elif solver == "rietveld":
-                todrop = ['simulated_files', 'simulated_reflects', 'gpx']
-                columns_stack = ['provider',
-                                 'id',
-                                 'name',
-                                 'filename',
-                                 'spacegroup',
-                                 'spacegroup_number',
-                                 'crystal_system',
-                                 'system_type',
-                                 'full_path',
-                                 'Cij']
+                todrop = ["simulated_files", "simulated_reflects", "gpx"]
+                columns_stack = [
+                    "provider",
+                    "id",
+                    "name",
+                    "filename",
+                    "spacegroup",
+                    "spacegroup_number",
+                    "crystal_system",
+                    "system_type",
+                    "full_path",
+                    "Cij",
+                ]
                 for df in topn:
                     df.drop(todrop, axis=1, inplace=True)
                     df.reset_index(inplace=True, drop=True)
                 for i in range(1, len(topn)):
-                    best_last = topn[i - 1].loc[0, columns_stack].apply(lambda e: e if type(e) == list else [str(e)])
+                    best_last = (
+                        topn[i - 1]
+                        .loc[0, columns_stack]
+                        .apply(lambda e: e if type(e) == list else [str(e)])
+                    )
                     for k in range(len(topn[i])):
-                        topn[i].loc[k, columns_stack] = best_last + topn[i].loc[k, columns_stack].apply(
-                            lambda e: [str(e)])
+                        topn[i].loc[k, columns_stack] = best_last + topn[i].loc[
+                            k, columns_stack
+                        ].apply(lambda e: [str(e)])
                 df_final = pd.concat(topn)
-                df_final.sort_values(by='rwp', inplace=True)
+                df_final.sort_values(by="rwp", inplace=True)
                 df_final.reset_index(drop=True, inplace=True)
-                df_final.to_csv(os.path.join(self.working_folder, "Refinement Results.csv"), index=False)
+                df_final.to_csv(
+                    os.path.join(self.working_folder, "Refinement Results.csv"),
+                    index=False,
+                )
                 print("Analysis complete")
-                best_rwp = df_final['rwp'].iat[0]
-                best_gpx = df_final['gpx_path'].iat[0]
-                best_cifs = df_final['filename'].iat[0]
-                print("Best combination: {}, Rwp: {}%".format('_'.join(best_cifs), best_rwp))
+                best_rwp = df_final["rwp"].iat[0]
+                best_gpx = df_final["gpx_path"].iat[0]
+                best_cifs = df_final["filename"].iat[0]
+                print(
+                    "Best combination: {}, Rwp: {}%".format(
+                        "_".join(best_cifs), best_rwp
+                    )
+                )
 
         self.rwp = best_rwp
         self.gpx_best = best_gpx
@@ -683,9 +797,15 @@ class XRay:
             plot_all_gpx(gpx_files + os.sep)
         return df_final
 
-
-    def plot_highest_correlated(self, top: int = 30, offset: float = 0.3, imult: float = 1.0, width: int = 1280, height: int = 968,
-                  **kwargs) -> XRay:
+    def plot_highest_correlated(
+        self,
+        top: int = 30,
+        offset: float = 0.3,
+        imult: float = 1.0,
+        width: int = 1280,
+        height: int = 968,
+        **kwargs,
+    ) -> XRay:
         """
         Plot the top N highest correlated patterns with given experimental data using Plotly.
         Parameters
@@ -703,20 +823,22 @@ class XRay:
         """
         # Set up the "simulated" dataframe in a easy way for plotting
         self._read_simulations()
-        dummy_data = [('name', 'Exp.Data'),
-                      ('provider', 'Xray machine'),
-                      ('mid', 0),
-                      ('spacegroup', '?'),
-                      ('spacegroup_number', '?'),
-                      ('crystal_system', '?'),
-                      ('Cij', 1)]
+        dummy_data = [
+            ("name", "Exp.Data"),
+            ("provider", "Xray machine"),
+            ("mid", 0),
+            ("spacegroup", "?"),
+            ("spacegroup_number", "?"),
+            ("crystal_system", "?"),
+            ("Cij", 1),
+        ]
         col_order = self.simulated_gsas2[0][0].columns
         exp_data = self.exp_data.copy()
         for col, val in dummy_data:
             exp_data[col] = val
         patterns = [t[0] for t in self.simulated_gsas2]
         temp = self.cif_info.copy()
-        temp.sort_values(by='Cij', inplace=True)
+        temp.sort_values(by="Cij", inplace=True)
         temp.reset_index(drop=True, inplace=True)
         # j = self.cif_info.loc[0, c_to_grab]
         exp_data = exp_data[col_order]
@@ -728,32 +850,28 @@ class XRay:
         SCALER_MAX = exp_data.int.max()
         exp_data.int = exp_data.int / SCALER_MAX
         plotly_df = pd.concat([exp_data] + top_patterns)
-        hover_data = ['spacegroup', 'crystal_system', 'spacegroup_number', 'Cij']
-        figure = px.line(plotly_df,
-                         x='theta',
-                         y='int',
-                         color='filename',
-                         width=width,
-                         height=height,
-                         hover_data=hover_data, **kwargs)
-        config = dict({'scrollZoom': True})
-        ## some default plotly options ##
-        hoverlabel = dict(
-            font_size=18,
-            font_family="Arial"
+        hover_data = ["spacegroup", "crystal_system", "spacegroup_number", "Cij"]
+        figure = px.line(
+            plotly_df,
+            x="theta",
+            y="int",
+            color="filename",
+            width=width,
+            height=height,
+            hover_data=hover_data,
+            **kwargs,
         )
-        legend = {'font': dict(size=18)}
+        config = dict({"scrollZoom": True})
+        ## some default plotly options ##
+        hoverlabel = dict(font_size=18, font_family="Arial")
+        legend = {"font": dict(size=18)}
 
         # Edit First and Second Plot
-        figure.data[0]['mode'] = 'markers'
+        figure.data[0]["mode"] = "markers"
         figure.data[0].marker.color = "black"
-        figure.data[0].marker.symbol = 'circle-open'
-        figure.data[0].name = 'Exp. Data'
-        figure.update_layout(
-            hoverlabel=hoverlabel,
-            legend=legend,
-            modebar_add=to_add
-        )
+        figure.data[0].marker.symbol = "circle-open"
+        figure.data[0].name = "Exp. Data"
+        figure.update_layout(hoverlabel=hoverlabel, legend=legend, modebar_add=to_add)
         name = os.path.basename(self.filename)
         name = name.replace(".ras", "")
         outfolder = self.working_folder
@@ -764,7 +882,13 @@ class XRay:
         # figure.show()
         return self
 
-    def plot_result(self, index: int, engine: str = "plotly", mode: str = "simul", save: bool = False) -> Any[None, object]:
+    def plot_result(
+        self,
+        index: int,
+        engine: str = "plotly",
+        mode: str = "simul",
+        save: bool = False,
+    ) -> Any[None, object]:
         """
         Plot a result of a specific index of the results dataframe
         Parameters
@@ -778,34 +902,55 @@ class XRay:
         None or a matplotlib figure
         """
         if engine == "matplotlib":
-            plot_gpx(path=self.results.gpx_path.iat[index], save=save, engine=engine, outfolder=self.working_folder)
+            plot_gpx(
+                path=self.results.gpx_path.iat[index],
+                save=save,
+                engine=engine,
+                outfolder=self.working_folder,
+            )
         else:
             if mode == "bragg":
-                return plot_gpx(path=self.results.gpx_path.iat[index], save=save, engine=engine, outfolder=self.working_folder)
+                return plot_gpx(
+                    path=self.results.gpx_path.iat[index],
+                    save=save,
+                    engine=engine,
+                    outfolder=self.working_folder,
+                )
             else:
                 simul_folder = os.path.join(self.working_folder, "Simul")
-                names = self.results['name'].iat[index]
-                spacegroups = self.results['spacegroup'].iat[index]
-                cif_names = self.results['filename'].iat[index]
+                names = self.results["name"].iat[index]
+                spacegroups = self.results["spacegroup"].iat[index]
+                cif_names = self.results["filename"].iat[index]
 
                 # If its a string, we setup as a list (required for plotting func.) and make the new name.
                 if type(cif_names) == str:
                     cif_names = [cif_names]
                     phasenames = [f"{names}-{spacegroups.replace('/', '-')}"]
                 else:
-                    phasenames = [n + "-" + spg.replace("/", "-") for n, spg in zip(names, spacegroups)]
+                    phasenames = [
+                        n + "-" + spg.replace("/", "-")
+                        for n, spg in zip(names, spacegroups)
+                    ]
                 # now we make simul names
                 # now we make simul names
-                simul = [pd.read_csv(os.path.join(simul_folder, file.replace(".cif", "_Simul.csv"))) for file in
-                         cif_names]
+                simul = [
+                    pd.read_csv(
+                        os.path.join(simul_folder, file.replace(".cif", "_Simul.csv"))
+                    )
+                    for file in cif_names
+                ]
                 for i, df in enumerate(simul):
-                    df['phase_name'] = phasenames[i]
-                return plot_gpx(path=self.results.gpx_path.iat[index], save=save, engine=engine, s_info=simul,
-                                type=mode, outfolder=self.working_folder)
+                    df["phase_name"] = phasenames[i]
+                return plot_gpx(
+                    path=self.results.gpx_path.iat[index],
+                    save=save,
+                    engine=engine,
+                    s_info=simul,
+                    type=mode,
+                    outfolder=self.working_folder,
+                )
 
-    def initialize_optimizer(self,
-                            index: Any[List[int], int]
-                            ) -> XRay:
+    def initialize_optimizer(self, index: Any[List[int], int]) -> XRay:
         """
         Initialize an optmizer for a index or a list of indexes of the result dataframe.
         This function provides a option for easily joining different set of results for a optimizaiton of phases gaven
@@ -842,28 +987,30 @@ class XRay:
             if type(cifs) != list:
                 cifs = [cifs]
 
-        self.optimizer = GSASRefiner(expdata=self.exp_data_file,
-                                     working_folder=self.working_folder,
-                                     cifs=cifs)
+        self.optimizer = GSASRefiner(
+            expdata=self.exp_data_file, working_folder=self.working_folder, cifs=cifs
+        )
         self.optimizer.quick_refinement()  # show up default
 
         return self
 
-    def run_optimizer(self,
-                      plot_best: bool = True,
-                      show_lattice: bool = True,
-                      random_state: int = 42,
-                      n_jobs: int = -1,
-                      n_trials: int = 200,
-                      n_startup: int = 20,
-                      allow_pref_orient: bool = True,
-                      allow_atomic_params: bool = False,
-                      allow_broad: bool = False,
-                      allow_strain: bool = False,
-                      allow_angle: bool = False,
-                      force_ori: bool = False,
-                      verbose: str = "silent",
-                      param: str = "rwp") -> XRay:
+    def run_optimizer(
+        self,
+        plot_best: bool = True,
+        show_lattice: bool = True,
+        random_state: int = 42,
+        n_jobs: int = -1,
+        n_trials: int = 200,
+        n_startup: int = 20,
+        allow_pref_orient: bool = True,
+        allow_atomic_params: bool = False,
+        allow_broad: bool = False,
+        allow_strain: bool = False,
+        allow_angle: bool = False,
+        force_ori: bool = False,
+        verbose: str = "silent",
+        param: str = "rwp",
+    ) -> XRay:
         """
         Start the Blackbox Optimization as suggested by NPJ Comp. Mat. XX xXX (2020)
         Parameters
@@ -889,26 +1036,27 @@ class XRay:
         """
 
         if self.optimizer is not None:
-            self.optimizer.fit_optimize(n_jobs=n_jobs,
-                                        n_startup=n_startup,
-                                        n_trials=n_trials,
-                                        random_state=random_state,
-                                        allow_angle=allow_angle,
-                                        allow_broad=allow_broad,
-                                        allow_pref_orient=allow_pref_orient,
-                                        allow_atomic_params=allow_atomic_params,
-                                        allow_strain=allow_strain,
-                                        force_ori=force_ori,
-                                        verbose=verbose,
-                                        param=param
-                                        )
+            self.optimizer.fit_optimize(
+                n_jobs=n_jobs,
+                n_startup=n_startup,
+                n_trials=n_trials,
+                random_state=random_state,
+                allow_angle=allow_angle,
+                allow_broad=allow_broad,
+                allow_pref_orient=allow_pref_orient,
+                allow_atomic_params=allow_atomic_params,
+                allow_strain=allow_strain,
+                force_ori=force_ori,
+                verbose=verbose,
+                param=param,
+            )
 
         if plot_best:
             self.optimizer.plot_result()
         if show_lattice:
             print(self.optimizer.lattice_best)
 
-        self.optgpx = os.path.join(self.working_folder, 'optuna', self.optimizer.best)
+        self.optgpx = os.path.join(self.working_folder, "optuna", self.optimizer.best)
         self.optlat = self.optimizer.lattice_best
         self.optrwp = self.optimizer.optim.rwp_best
         return self
