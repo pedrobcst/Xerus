@@ -19,6 +19,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
+
 import os
 import sys
 from pathlib import Path
@@ -28,37 +29,39 @@ project_path = (
 )  # so convoluted..
 if project_path not in sys.path:
     sys.path.append(project_path)
+from multiprocessing import Pool
+from typing import Any, List, Tuple, Union
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from typing import List, Tuple, Any, Union
-from multiprocessing import Pool
 from pymatgen import Composition
+
 from Xerus.db.localdb import LocalDB
-from Xerus.utils.tools import (
-    group_data,
-    normalize_formula,
-    make_offset,
-    blockPrinting,
-    save_json,
-    load_json,
-    create_folder,
-)
-from Xerus.utils.tools import plotly_add as to_add
-from Xerus.utils.cifutils import make_system_types, make_system
+from Xerus.engine.gsas2riet import refine_comb, simulate_spectra
+from Xerus.engine.gsas2utils import make_gpx
+from Xerus.engine.gsas2viz import plot_all_gpx, plot_gpx
+from Xerus.engine.gsas2wrap import GSASRefiner
 from Xerus.readers.datareader import DataReader
 from Xerus.settings.settings import GSAS2_BIN, INSTR_PARAMS
 from Xerus.similarity.pattern_removal import (
-    run_correlation_analysis,
     combine_pos,
+    run_correlation_analysis,
     run_correlation_analysis_riet,
 )
 from Xerus.similarity.visualization import make_plot_all, make_plot_step
-from Xerus.engine.gsas2viz import plot_all_gpx, plot_gpx
-from Xerus.engine.gsas2wrap import GSASRefiner
-from Xerus.engine.gsas2riet import simulate_spectra, refine_comb
-from Xerus.engine.gsas2utils import make_gpx
+from Xerus.utils.cifutils import make_system, make_system_types
 from Xerus.utils.preprocessing import remove_baseline, standarize_intensity
+from Xerus.utils.tools import (
+    blockPrinting,
+    create_folder,
+    group_data,
+    load_json,
+    make_offset,
+    normalize_formula,
+)
+from Xerus.utils.tools import plotly_add as to_add
+from Xerus.utils.tools import save_json
 
 
 class XRay:
@@ -494,7 +497,7 @@ class XRay:
         combine_filter: bool = False,
         select_cifs: bool = True,
         plot_all: bool = False,
-        ignore_provider: Tuple[str] = ("AFLOW"),
+        ignore_provider: List[str] = ("AFLOW",),
         ignore_comb: List[str] = None,
         ignore_ids: List[str] = None,
         solver: str = "box",
