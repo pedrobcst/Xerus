@@ -49,19 +49,19 @@ _Xerus_ was mostly developed in __Ubuntu 20.04__ and have been also tested in __
 ```diff
 - We have not tested in Windows OS yet.
 ```
-#### MongoDB
-_Xerus_ relies on a MongoDB server for caching crystal structures downloaded from the providing databases (COD, AFLOW and MP)
-
-So before anything else, please download the community server from MongoDB 
-https://www.mongodb.com/try/download/community
-
-We recommend running it locally (localhost) \
-__Tutorial__: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
 
 #### Materials Project APIKey
 Xerus relies on the Materials Project API for downloading crystal structures with requested chemical space.
 Therefore, please register and obtain an suitable API key (Free) at: \
-www.materialsproject.org
+www.materialsproject.org \
+After registering, you can check your API Key by clicking the API tab at the upper right side of the website.
+
+##### MongoDB
+_Xerus_ relies on a MongoDB server for caching crystal structures downloaded from the providing databases (COD, AFLOW and MP) \
+To install the community version (Free) and run please follow the steps listed in:
+ * [Ubuntu Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
+ * [MacOS Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
+
 ## _Xerus_
 ### Package Installation
 To install _Xerus_ using a virtual enviroment with Python 3.8 follow this steps:
@@ -73,6 +73,7 @@ git clone http://www.github.com/pedrobcst/Xerus/
 cd Xerus
 pip install -r requirements.txt
 ```
+> :warning: You might have trouble installing pymatgen if gcc is not present in your system. You can them for example do sudo apt install g++ to install in Ubuntu, then run pip install -r requirements.txt again. 
 
 
 ### Configuration
