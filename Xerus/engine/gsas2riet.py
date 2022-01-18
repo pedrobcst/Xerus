@@ -21,17 +21,18 @@
 import os
 import sys
 from pathlib import Path
+
 project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
 if project_path not in sys.path:
     sys.path.append(project_path)
 
-from Xerus.utils.tools import blockPrinting
-from Xerus.settings.settings import GSAS2_BIN
-from Xerus.settings.settings import INSTR_PARAMS
-from Xerus.engine.gsas2utils import get_wtfract
-from Xerus.engine.gsas2utils import parse_reflections_array
+from typing import List, Tuple, Union
+
 import pandas as pd
-from typing import Tuple, List, Union
+from Xerus.engine.gsas2utils import get_wtfract, parse_reflections_array
+from Xerus.settings.settings import GSAS2_BIN, INSTR_PARAMS
+from Xerus.utils.tools import blockPrinting
+
 sys.path.insert(0, os.path.expanduser(GSAS2_BIN))
 import GSASIIscriptable as G2sc
 
@@ -109,6 +110,7 @@ def simulate_pattern(filename: str, instr_params:str = INSTR_PARAMS, tmin: float
                                                Tstep=step,
                                                phases=gpx.phases(),
                                                scale=scale)
+    # gpx.histograms()[0].data['Instrument Parameters'][0]['Zero'] = 0
     try:
         gpx.do_refinements([{}])
     except:
@@ -120,8 +122,8 @@ def simulate_pattern(filename: str, instr_params:str = INSTR_PARAMS, tmin: float
         if y.std() < threshold:
             status = -1
     except (KeyError, IndexError) as e:
-        status = -1
-    return status
+        return -1  
+    return 1
 
 
 def run_gsas_mp2(powder_data: str, cifs: Tuple[str], phasenames: Tuple[str], outfolder: str,
@@ -174,14 +176,14 @@ def run_gsas_mp2(powder_data: str, cifs: Tuple[str], phasenames: Tuple[str], out
 
     refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True},
                         "Cell": True,
-                        "Instrument Parameters": ["Zero"],
-                        "Scale": True}}
-    refdict4a = {"set": {'Sample Parameters': ['Shift']}}
+                        "Scale": True,
+                        'Sample Parameters': ['DisplaceX']}}
+    # refdict4a = {"set": {'Sample Parameters': ['DisplaceX', 'Shift']}}
     refdict_ori = {"set": {"Pref.Ori.": True}, "phases": phases[0]}
     refdict5c = {"set": {'Instrument Parameters': ['U', 'V', 'W']}}
-    dictList = [refdict0, refdict4a, refdict5c]
+    dictList = [refdict0,  refdict5c]
     if ori:
-        dictList = [refdict0, refdict4a, refdict_ori, refdict5c]
+        dictList = [refdict0,  refdict_ori, refdict5c]
     gpx.do_refinements(dictList)
     wt = get_wtfract(gpx_name.replace(".gpx", ".lst"), len(cifs))
     rwp = HistStats(gpx)
@@ -328,14 +330,14 @@ def run_gsas(powder_data: str, cif_name: str, phasename: str,
     #for val in phase0.data['Atoms']:
     #    val[9] = 'I'
     refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True}, "Scale": True}}
-    refdict1 = {"set": {"Cell": True, 'Instrument Parameters': ["Zero"]}, "call": HistStats}
-    refdict4a = {"set": {'Sample Parameters': ['Shift']}}
+    refdict1 = {"set": {"Cell": True, 'Sample Parameters': ['DisplaceX']}}
+    # refdict4a = {"set": {'Sample Parameters': ['DisplaceX']}}
     refdict_ori = {"set": {"Pref.Ori.": True}}
     refdict4b = {"set": {"Atoms": {"all": "XU"}}}
     refdict5a = {"set": {'Limits': limits}}
     refdict5c = {"set": {'Instrument Parameters': ['U', 'V', 'W']}}
 
-    dictList = [refdict0, refdict1, refdict4a, refdict_ori, refdict5a, refdict4b, refdict5c]
+    dictList = [refdict0, refdict1, refdict_ori, refdict5a, refdict4b, refdict5c]
     gpx.do_refinements(dictList)
     #os.remove(gpx_name)
     return HistStats(gpx), gpx_name
@@ -396,16 +398,16 @@ def quick_gsas(powder_data: str, cif_name: str, phasename: str, outfolder: str, 
     #                     "Instrument Parameters": ["Zero"],
     #                     "Scale": True}}
     refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True}}}
-    refdict1 = {"set": {"Cell": True, 'Instrument Parameters': ["Zero"]}}
+    refdict1 = {"set": {"Cell": True, 'Sample Parameters': ['DisplaceX']}}
 
-    refdict4a = {"set": {'Sample Parameters': ['Shift']}}
-    refdict4b = {"set": {"Atoms": {"all": "XU"}}}
+    # refdict4a = {"set": {'Sample Parameters': ['Shift', 'DisplaceX']}}
+    # refdict4b = {"set": {"Atoms": {"all": "XU"}}}
     refdict_ori = {"set": {"Pref.Ori.": True}}
     refdict5c = {"set": {'Instrument Parameters': ['U', 'V', 'W']}}
     if ori:
-        dictList = [refdict0, refdict1,  refdict4a, refdict_ori, refdict5c]
+        dictList = [refdict0, refdict1, refdict_ori, refdict5c]
     else:
-        dictList = [refdict0, refdict4a, refdict5c]
+        dictList = [refdict0, refdict1, refdict5c]
     gpx.do_refinements(dictList)
     # os.remove(gpx_name)
     if name:
