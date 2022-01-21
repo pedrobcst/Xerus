@@ -64,6 +64,7 @@ To install the community version (Free) and run please follow the steps listed i
 
 ## _Xerus_
 ### Package Installation
+_Xerus_ currently can only be installed via conda. Therefore, if you do not have conda, please follow the install instructions [here](https://www.anaconda.com/products/individual). \
 To install _Xerus_ using a virtual enviroment with Python 3.8 follow this steps:
 
 ```
