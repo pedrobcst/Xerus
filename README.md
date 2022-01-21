@@ -113,9 +113,12 @@ pytest
 ```
 If all tests sucessfuly pass, _Xerus_ should be ready for use.
 
+> :warning: This process might take a while. 
 # Usage
 
 - To learn how to use Xerus, please follow the Notebook, located at Examples/Examples.ipynb
+
+> :warning: Make sure that before running the examples, you have started the MongoDB server. 
 
 # Citing
 If you use _Xerus_ please __also__ cite the following papers:
