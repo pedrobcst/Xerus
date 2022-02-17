@@ -124,7 +124,7 @@ If all tests sucessfuly pass, _Xerus_ should be ready for use.
 If you use _Xerus_ please __also__ cite the following papers:
 
 * If you use only phase matching:
-  * Pedro Baptista de Castro, Kensei Terashima, Miren Garbiñe Esparza Echevarría, Hiroyuki Takeya, Yoshihiko Takano (2021). "XERUS: An open-source tool for quick XRD phase identification and refinement automation" arXiv:2112.04773, https://arxiv.org/abs/2112.04773
+  * Baptista de Castro, P., Terashima, K., Esparza Echevarria, M.G., Takeya, H. and Takano, Y. (2022), XERUS: An Open-Source Tool for Quick XRD Phase Identification and Refinement Automation. Adv. Theory Simul. 2100588. https://doi.org/10.1002/adts.202100588
   * Toby, B. H., & Von Dreele, R. B. (2013). "GSAS-II: the genesis of a modern open-source all purpose crystallography software package". Journal of Applied Crystallography, 46(2), 544-549. ​doi:10.1107/S0021889813003531
 
 
