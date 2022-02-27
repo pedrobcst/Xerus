@@ -1,3 +1,3 @@
-import os
+from pathlib import Path
 
-INSTALL_PATH = os.path.abspath(__file__)
+INSTALL_PATH = Path(__file__).parent

@@ -2,9 +2,8 @@ import os
 import sys
 from pathlib import Path
 
-projectpath = Path(os.getcwd()).parent.as_posix() + os.sep
-sys.path.append(projectpath)
 from Xerus.settings.settings import GSAS2_BIN, INSTR_PARAMS, TEST_XRD
+from . import INSTALL_PATH
 
 sys.path.append(GSAS2_BIN)
 import shutil
@@ -24,7 +23,7 @@ def test_simulation():
     1 if works.
     """
 
-    status = simulate_pattern(filename="cif/HoB2_MP_mp-2267.cif")
+    status = simulate_pattern(filename=INSTALL_PATH / "cif/HoB2_MP_mp-2267.cif")
     files = [
         "dummy.bak0.gpx",
         "dummy.csv",
@@ -45,6 +44,6 @@ def test_refinement():
     -------
 
     """
-    rwp, gpx = quick_gsas(cif_name="cif/HoB2_MP_mp-2267.cif", powder_data=TEST_XRD, phasename="Any", outfolder=".")
+    rwp, gpx = quick_gsas(cif_name=INSTALL_PATH / "cif/HoB2_MP_mp-2267.cif", powder_data=TEST_XRD, phasename="Any", outfolder=".")
     shutil.rmtree("gsas2_files")
     assert rwp <= 35

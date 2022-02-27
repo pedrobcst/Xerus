@@ -1,8 +1,7 @@
 import sys, os
 from pathlib import Path
-projectpath = Path(os.getcwd()).parent.as_posix() + os.sep
-sys.path.append(projectpath)
 from Xerus.settings.settings import  GSAS2_BIN
+from . import INSTALL_PATH
 sys.path.append(GSAS2_BIN)
 from Xerus import XRay
 import pytest
@@ -23,7 +22,7 @@ def test_boxauto():
     r = XRay(
         name="HoB2",
         elements=["Ho", "B"],
-        exp_data_file="data/HoB21.ras",
+        exp_data_file=INSTALL_PATH / "data/HoB21.ras",
         data_fmt="ras",
         working_folder="tests_box_auto/",
         max_oxy=2,
@@ -49,7 +48,7 @@ def test_boxmethod():
     r = XRay(
         name="HoB2",
         elements=["Ho", "B"],
-        exp_data_file="data/HoB21.ras",
+        exp_data_file=INSTALL_PATH / "data/HoB21.ras",
         data_fmt="ras",
         working_folder="tests_box_method/",
         max_oxy=2,
@@ -75,7 +74,7 @@ def test_residualmethod():
     r = XRay(
         name="HoB2",
         elements=["Ho", "B"],
-        exp_data_file="data/HoB21.ras",
+        exp_data_file=INSTALL_PATH / "data/HoB21.ras",
         data_fmt="ras",
         working_folder="tests_residual_method/",
         max_oxy=2,
@@ -101,7 +100,7 @@ def test_onephaserun():
     r = XRay(
         name="HoB2",
         elements=["Ho", "B"],
-        exp_data_file="data/HoB21.ras",
+        exp_data_file=INSTALL_PATH / "data/HoB21.ras",
         data_fmt="ras",
         working_folder="tests_box_method/",
         max_oxy=2,
