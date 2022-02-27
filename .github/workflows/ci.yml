@@ -48,4 +48,4 @@ jobs:
         pip install -e .
 
     - name: Run all tests
-      run: pytest -rs -vvv
+      run: pytest -rs -vvv -m "not user"

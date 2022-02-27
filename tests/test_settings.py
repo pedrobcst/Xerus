@@ -15,6 +15,7 @@ import pytest
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.user
 def test_dbconn():
     """
     Tests connection to localdatabase
@@ -35,6 +36,7 @@ def test_dbconn():
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.user
 def test_mpconn():
     """
     Tests Materials Project Connection
