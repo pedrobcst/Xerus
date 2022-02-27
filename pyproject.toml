@@ -1,0 +1,2 @@
+# Blank pyproject.toml file to allow for pip install without providing a setup.pyproject
+# This file can eventually contain configs for linters etc.
