@@ -24,9 +24,6 @@ import os
 import sys
 from pathlib import Path
 from typing import List, Tuple
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.utils.cifutils import rename_multicif
 
 

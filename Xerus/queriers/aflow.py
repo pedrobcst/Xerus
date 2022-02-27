@@ -29,9 +29,6 @@ from pymatgen.io.cif import CifParser, CifWriter
 import json
 import shutil
 from typing import List, Tuple
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.db.localdb import LocalDB
 from Xerus.utils.cifutils import get_ciflist
 

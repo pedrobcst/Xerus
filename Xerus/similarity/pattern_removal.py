@@ -21,9 +21,6 @@
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 import pandas as pd
 import numpy as np
 from Xerus.engine.gsas2riet import quick_gsas

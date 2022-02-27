@@ -40,10 +40,6 @@
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent.parent) + os.sep # so convoluted..
-print(project_path)
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.engine.gsas2riet import run_gsas, simulate_pattern
 import json
 from Xerus.settings.settings import TEST_XRD, INSTR_PARAMS

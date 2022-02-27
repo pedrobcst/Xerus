@@ -24,9 +24,6 @@ import numpy as np
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.settings.settings import GSAS2_BIN
 import os
 

@@ -22,9 +22,6 @@ import os
 import sys
 from pathlib import Path
 from typing import List
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.queriers.mp import querymp
 from Xerus.queriers.cod import CODQuery
 from Xerus.queriers.aflow import AFLOWQuery

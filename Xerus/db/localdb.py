@@ -22,9 +22,6 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.utils.cifutils import write_cif, make_system_types
 from Xerus.utils.tools import create_folder, load_json
 import pandas as pd
