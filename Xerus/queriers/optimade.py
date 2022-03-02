@@ -6,28 +6,34 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Union
+
 project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
 if project_path not in sys.path:
     sys.path.append(project_path)
 
 import requests
-from optimade.adapters import Structure, get_cif
+from Xerus.utils.tools import create_folder
+
+from optimade.adapters import Structure
 
 
-class OptimadeQuery(object):
+class OptimadeQuery:
 
     def __init__(
         self, 
         base_url: str, 
         elements: List[str] = None, 
-        folder_path: os.PathLike = ""
+        folder_path: os.PathLike = "",
+        symprec: float = 0.01,
+        
     ):
         """Initialise the query objects for a given database.
         
         Parameters:
             elements: The list of element symbols that define the chemical space to query.
             base_url: The base URL of the OPTIMADE API for the database.
+            symprec: Symmetry tolerance to pass to spglib for symmetrization purposes (default = 0.01)
 
         """
 
@@ -36,19 +42,34 @@ class OptimadeQuery(object):
         self.base_url = base_url
         self.optimade_endpoint = "structures"
         self.optimade_filter = "filter=elements HAS ONLY " + ",".join(f'"{e}"' for e in self.elements)
-        os.mkdir(self.folder_path, exist_ok=True)
+        self.symprec = symprec
+        os.makedirs(self.folder_path, exist_ok=True)
 
-    def make_name(self, entry, meta) -> str:
-        return f'{meta["provider"]["prefix"]}_{entry["id"]}.cif'
+    def make_suffix(self, entry: dict, meta: dict) -> str:
+        """Makes CIF suffix name from an OPTIMADE entry dictionary and meta-data information
 
+        Parameters
+        ----------
+        entry : dict
+            OptimadeStructure.struc.dict()
+        meta : dict
+            Meta-data dictionary
 
-    def query(self, query_url: str | None) -> None:
+        Returns
+        -------
+        str
+            Returns the suffix of _Provider_ProviderID
+        """
+        return f'{meta["provider"]["prefix"].upper()}_{entry["id"]}.cif'
+
+    def query(self, query_url: Union[str, None] = None) -> None:
 
         if not query_url:
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}"
 
         response = requests.get(query_url)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
+        print(f"Query {query_url} returned status code {response.status_code}")
         next_query_url = None
         if response.status_code == 200:
             data = response.json()
@@ -56,12 +77,20 @@ class OptimadeQuery(object):
             if meta["more_data_available"]:
                 next_query_url = data["links"]["next"]
 
-            structures = [Structure(**entry) for entry in data["data"]]
+            structures = [Structure(entry) for entry in data["data"]]
 
             for structure in structures:
-                cif_fname = self.make_name(structure.entry, structure)
-                with open(self.folder_path / cif_fname, "w") as f:
-                    f.write(get_cif(structure))
+                # Get the suffix from provider and provider id
+                cif_suffix = self.make_suffix(entry=structure.entry.dict(), meta=meta)
+                # Convert the optimade structure into pymatgen format
+                pymatgen_structure = structure.convert("pymatgen")
+                # Get the reduced formula
+                formula = pymatgen_structure.composition.reduced_formula
+                # Make the cifname
+                cifname = f"{formula}_{cif_suffix}"
+                print(f"Saving {cifname}... to {self.folder_path}/{cifname}...")
+                # Save cif to path
+                pymatgen_structure.to(fmt="cif", filename=self.folder_path.joinpath(cifname), symprec=self.symprec)
 
         if next_query_url:
             self.query(next_query_url)
