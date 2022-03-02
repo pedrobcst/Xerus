@@ -36,6 +36,7 @@ class OptimadeQuery(object):
         self.base_url = base_url
         self.optimade_endpoint = "structures"
         self.optimade_filter = "filter=elements HAS ONLY " + ",".join(f'"{e}"' for e in self.elements)
+        self.optimade_response_fields = "response_fields=cartesian_site_positions,species,elements,nelements,species_at_sites,lattice_vectors,last_modified,elements_ratios,chemical_formula_descriptive,chemical_formula_reduced,chemical_formula_anonymous,nperiodic_dimensions,nsites,structure_features"
         os.mkdir(self.folder_path, exist_ok=True)
 
     def make_name(self, entry, meta) -> str:
@@ -45,7 +46,7 @@ class OptimadeQuery(object):
     def query(self, query_url: str | None) -> None:
 
         if not query_url:
-            query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}"
+            query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}"
 
         response = requests.get(query_url)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
