@@ -71,7 +71,7 @@ class OptimadeQuery:
 
     def query(self, query_url: Union[str, None] = None) -> None:
         if not query_url:
-            query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}"
+            query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}&page_limit=10"
 
         response = requests.get(query_url)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
