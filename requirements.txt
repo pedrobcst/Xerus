@@ -11,3 +11,4 @@ optuna==2.4.0
 pytest>=6.2.1
 PeakUtils==1.3.3
 mongomock~=4.0
+optimade~=0.16

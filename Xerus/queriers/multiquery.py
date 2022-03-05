@@ -20,18 +20,21 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 import sys
+import shutil
 from pathlib import Path
 from typing import List
+
+from Xerus.db.localdb import LocalDB
 from Xerus.queriers.mp import querymp
 from Xerus.queriers.cod import CODQuery
 from Xerus.queriers.aflow import AFLOWQuery
 from Xerus.queriers.oqmd import OQMDQuery
+from Xerus.queriers.optimade import OptimadeQuery
 from Xerus.utils.cifutils import standarize, make_system, rename_multicif, get_provider
-import shutil
-import os
-import json
-from Xerus.db.localdb import LocalDB
-from pathlib import Path
+
+from Xerus.utils.cifutils import (get_provider, make_system, rename_multicif,
+                                  standarize)
+
 dbhandler = LocalDB()
 abs_path = Path(__file__).parent
 proj_path = os.sep.join(str(abs_path).split(os.sep)[1:-1])
@@ -130,6 +133,30 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     oqmd = OQMDQuery(element_list=element_list, dumpfolder=oqmd_path)
     oqmd.query()
     td.append(oqmd_path)
+    
+
+    # TODO: Evaluate on how to implement each querier through optimade via the generic OptimadeQuery interface
+    # # Some example OPTIMADE queries
+    # print("Querying some OPTIMADE APIs")
+    # cod_optimade = OptimadeQuery(
+    #     base_url="https://www.crystallography.net/tcod/optimade/v1/",
+    #     elements=element_list,
+    #     folder_path=Path("optimade")
+    # )
+
+    # Currently only MP works.
+    # mp_optimade = OptimadeQuery(
+    #     base_url="https://optimade.materialsproject.org/v1/",
+    #     elements=element_list,
+    #     folder_path=Path("optimade")
+    # )
+    # oqmd_optimade = OptimadeQuery(
+    #     base_url="https://oqmd.org/optimade/v1/",
+    #     elements=element_list,
+    #     folder_path=Path("optimade")
+    # )
+
+    # td.append(Path("optimade"))
 
     movecifs(dump_folders=td)
     print("Finished downloading CIFs.")
