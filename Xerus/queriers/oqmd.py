@@ -22,6 +22,7 @@ import requests
 from typing import Tuple
 from pymatgen import Structure
 import os
+from Xerus.settings.settings import REQUESTS_TIMEOUT
 
 
 class OQMDQuery:
@@ -54,7 +55,7 @@ class OQMDQuery:
         self._limit = str(limit)
         self._query_url = f"http://oqmd.org/oqmdapi/formationenergy?icsd=True&noduplicate=False&desc=False&sort_offset=0&limit={self._limit}&offset=0&fields=name,entry_id,icsd_id,composition_generic,spacegroup,prototype,ntypes,natoms,volume,delta_e,band_gap,stability&filter=element_set={self._elements}%20AND%20ntypes={self._element_restriction}%20AND%20stability%3C{self._stability}&response_format=json"
         try:
-            self._json_data = requests.get(self._query_url).json()
+            self._json_data = requests.get(self._query_url, timeout=REQUESTS_TIMEOUT).json()
             self._rawdata = self._json_data['data']
         except:
             self._rawdata = None

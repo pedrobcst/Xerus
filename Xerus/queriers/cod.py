@@ -25,6 +25,7 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 from Xerus.utils.cifutils import rename_multicif
+from Xerus.settings.settings import REQUESTS_TIMEOUT
 
 
 def make_name(url: str):
@@ -86,11 +87,11 @@ class CODQuery(object):
         else:
             print("I am querying the following combination from COD: {}".format("-".join(element_list)))
             print(query_url)
-            cif_data = requests.get(query_url)
+            cif_data = requests.get(query_url,  timeout=REQUESTS_TIMEOUT)
             if cif_data.status_code == 200:
                 cif_urls = cif_data.text.split("\n")[:-1]
                 for url in cif_urls:
-                    cif = requests.get(url)
+                    cif = requests.get(url, timeout=REQUESTS_TIMEOUT)
                     if cif.status_code == 200:
                         name = make_name(url)
                         with open(os.path.join(self.folder_path, name), "wb") as f:

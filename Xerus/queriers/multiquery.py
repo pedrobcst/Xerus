@@ -60,7 +60,8 @@ def movecifs(dump_folders: List[str] = dump_folders, test_folder: os.PathLike = 
         if os.path.isdir(folder):
             files = os.listdir(folder)
             for file in files:
-                shutil.move(os.path.join(folder,file), test_folder)
+                if not os.path.exists(os.path.join(test_folder, file)):
+                    shutil.move(os.path.join(folder, file), test_folder)
             shutil.rmtree(folder)
 
 
