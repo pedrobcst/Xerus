@@ -66,8 +66,7 @@ def test_boxauto(working_folder, mock_mp_rester, mock_mongo):
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@mongomock.patch(servers="mongodb://localhost:27017", on_new="create")
-def test_boxmethod(working_folder, mock_mp_rester):
+def test_boxmethod(working_folder, mock_mp_rester, mock_mongo):
     """
     Test box method with n_runs=2
     Returns
@@ -94,8 +93,7 @@ def test_boxmethod(working_folder, mock_mp_rester):
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@mongomock.patch(servers="mongodb://localhost:27017", on_new="create")
-def test_residualmethod(working_folder, mock_mp_rester):
+def test_residualmethod(working_folder, mock_mp_rester, mock_mongo):
     """
     Test rietveld method with n_runs=2
     Returns
@@ -122,8 +120,7 @@ def test_residualmethod(working_folder, mock_mp_rester):
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
-@mongomock.patch(servers="mongodb://localhost:27017", on_new="create")
-def test_onephaserun(working_folder, mock_mp_rester):
+def test_onephaserun(working_folder, mock_mp_rester, mock_mongo):
     """
     Test n_runs=1
     Returns
