@@ -1,4 +1,4 @@
 include *.md
-include *.conf
+include Xerus/settings/config.conf
 recursive-include Xerus/GSASII/bindist *.so
 recursive-include Xerus/inc *
