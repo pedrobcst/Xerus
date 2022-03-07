@@ -1,0 +1,4 @@
+include *.md
+include *.conf
+recursive-include Xerus/GSASII/bindist *.so
+recursive-include Xerus/inc *
