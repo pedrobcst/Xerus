@@ -40,17 +40,30 @@ class OptimadeQuery:
         """
         # TODO: Add option to pass a dictionary of extra filters to the query that can be done based on provider.
         if extra_filters:
-            extra_filter = " AND ".join([f"{key}{value}" for key, value in extra_filters.items()])
+            self.extra_filter = " AND ".join([f"{key}{value}" for key, value in extra_filters.items()])
         else:
-            extra_filter = ""
+            self.extra_filter = None
         self.elements = elements
         self.folder_path = Path(folder_path)
         self.base_url = base_url
         self.optimade_endpoint = "structures"
-        self.optimade_filter = "filter=elements HAS ONLY " + ",".join(f'"{e}"' for e in self.elements) + f" AND {extra_filter}"
         self.symprec = symprec
         os.makedirs(self.folder_path, exist_ok=True)
         self.optimade_response_fields = "response_fields=cartesian_site_positions,species,elements,nelements,species_at_sites,lattice_vectors,last_modified,elements_ratios,chemical_formula_descriptive,chemical_formula_reduced,chemical_formula_anonymous,nperiodic_dimensions,nsites,structure_features,dimension_types"
+
+    @property
+    def optimade_filter(self) -> str:
+        """Optimade filter string for the query.
+
+        Returns
+        -------
+        str
+            Returns the string of the optimade filter and take care with there are any extra filter or not.
+        """
+        filter = "filter=elements HAS ONLY " + ",".join(f'"{e}"' for e in self.elements)
+        if self.extra_filter is not None:
+            filter += f" AND {self.extra_filter}"
+        return filter
 
     def make_suffix(self, entry: dict, meta: dict) -> str:
         """Makes CIF suffix name from an OPTIMADE entry dictionary and meta-data information
