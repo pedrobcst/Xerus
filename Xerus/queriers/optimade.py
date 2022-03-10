@@ -8,8 +8,6 @@ import sys
 from pathlib import Path
 from typing import List, Union
 
-from django.forms import ValidationError
-
 project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
 if project_path not in sys.path:
     sys.path.append(project_path)
@@ -119,7 +117,7 @@ class OptimadeQuery:
                     print(f"Saving {cifname}... to {self.folder_path}/{cifname}...")
                     # Save cif to path
                     pymatgen_structure.to(fmt="cif", filename=self.folder_path.joinpath(cifname), symprec=self.symprec)
-                except ValidationError:
+                except ValueError:
                         print(f'Failed to convert {entry["id"]} to pymatgen structure..')
                 
         if next_query_url:
