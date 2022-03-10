@@ -8,6 +8,8 @@ import sys
 from pathlib import Path
 from typing import List, Union
 
+from django.forms import ValidationError
+
 project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
 if project_path not in sys.path:
     sys.path.append(project_path)
@@ -83,12 +85,16 @@ class OptimadeQuery:
         return f'{meta["provider"]["prefix"].upper()}_{entry["id"]}.cif'
 
     def query(self, query_url: Union[str, None] = None) -> None:
+        print("Querying......")
         if not query_url:
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}&page_limit=10"
 
         response = requests.get(query_url)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
+        print(f"Query {query_url} returned status code {response.status_code}")
         next_query_url = None
+        if response.status_code == 404:
+            raise ValueError("Query returned 404, check provider URL")
         if response.status_code == 200:
             data = response.json()
             meta = data["meta"]
@@ -113,7 +119,7 @@ class OptimadeQuery:
                     print(f"Saving {cifname}... to {self.folder_path}/{cifname}...")
                     # Save cif to path
                     pymatgen_structure.to(fmt="cif", filename=self.folder_path.joinpath(cifname), symprec=self.symprec)
-                except ValueError:
+                except ValidationError:
                         print(f'Failed to convert {entry["id"]} to pymatgen structure..')
                 
         if next_query_url:
