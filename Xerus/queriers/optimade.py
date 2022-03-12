@@ -1,10 +1,11 @@
-"""This submodule implements the `OptimadeQuery` class, which enables filtering 
+"""This submodule implements the `OptimadeQuery` class, which enables filtering
 on any crystal structure database that implements an [OPTIMADE API](https://optimade.org).
 
 """
 import logging
 import os
 import sys
+import itertools
 from pathlib import Path
 from typing import List, Union
 
@@ -21,16 +22,16 @@ from optimade.adapters import Structure
 class OptimadeQuery:
 
     def __init__(
-        self, 
-        base_url: str, 
-        elements: List[str] = None, 
+        self,
+        base_url: str,
+        elements: List[str] = None,
         folder_path: os.PathLike = "",
         symprec: float = 0.01,
         extra_filters: dict = None
-        
+
     ):
         """Initialise the query objects for a given database.
-        
+
         Parameters:
             elements: The list of element symbols that define the chemical space to query.
             base_url: The base URL of the OPTIMADE API for the database.
@@ -47,6 +48,17 @@ class OptimadeQuery:
         self.folder_path = Path(folder_path)
         self.base_url = base_url
         self.optimade_endpoint = "structures"
+
+        self.optimade_filter = "filter=elements HAS ONLY " + ",".join(f'"{e}"' for e in self.elements) + f" AND {extra_filter}"
+        element_space = [e for e in itertools.combinations(elements, n) for n in range(1, len(elements) + 1)]
+        self.optimade_filter_explicit = "filter="
+        filters = []
+        for space in element_space:
+            for subspace in space:
+                space_str = ", ".join(f'"{e}"' for e in subspace)
+                filters += [f"(elements HAS ALL {space_str} AND nelements={len(subspace)})"]
+        self.optimade_filter_explicit += "OR".join(filters)
+
         self.symprec = symprec
         os.makedirs(self.folder_path, exist_ok=True)
         self.optimade_response_fields = "response_fields=cartesian_site_positions,species,elements,nelements,species_at_sites,lattice_vectors,last_modified,elements_ratios,chemical_formula_descriptive,chemical_formula_reduced,chemical_formula_anonymous,nperiodic_dimensions,nsites,structure_features,dimension_types"
@@ -93,6 +105,12 @@ class OptimadeQuery:
         next_query_url = None
         if response.status_code == 404:
             raise ValueError("Query returned 404, check provider URL")
+
+        if response.status_code == 501:
+            # If the query returns 501 Not Implemented, assume it is the HAS ONLY which failed and try again with an explicit filter
+            query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter_explicit}&{self.optimade_response_fields}&page_limit=10"
+            response = requests.get(query_url)
+
         if response.status_code == 200:
             data = response.json()
             meta = data["meta"]
@@ -119,6 +137,6 @@ class OptimadeQuery:
                     pymatgen_structure.to(fmt="cif", filename=self.folder_path.joinpath(cifname), symprec=self.symprec)
                 except ValueError:
                         print(f'Failed to convert {entry["id"]} to pymatgen structure..')
-                
+
         if next_query_url:
             self.query(next_query_url)
