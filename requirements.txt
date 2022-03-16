@@ -10,3 +10,4 @@ optuna==2.4.0
 pytest>=6.2.1
 PeakUtils==1.3.3
 optimade~=0.16
+seaborn==0.11.2
