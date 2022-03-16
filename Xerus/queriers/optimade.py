@@ -122,20 +122,20 @@ class OptimadeQuery:
         return f'{meta["provider"]["prefix"].upper()}_{entry["id"]}.cif'
 
     def query(self, query_url: Union[str, None] = None) -> None:
+        if query_url:
+            print(f'Attempt to query {query_url}')
         print("Querying......")
         if not query_url:
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}&page_limit=10"
 
         response = requests.get(query_url)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
-        # print(f"Query {query_url} returned status code {response.status_code}")
         next_query_url = None
         if response.status_code == 404:
             raise ValueError("Query returned 404, check provider URL")
 
         if response.status_code == 501:
             # If the query returns 501 Not Implemented, assume it is the HAS ONLY which failed and try again with an explicit filter
-            # print("HAS ONLY failed, trying explicit filter...")
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter_hasall}&{self.optimade_response_fields}&page_limit=10"
             # print(f"Retrying query with {query_url} ....")
             response = requests.get(query_url)
@@ -150,11 +150,7 @@ class OptimadeQuery:
                     # print(f'Next query URL is a dictionary, trying to get the URL from the "href" key')
                     next_query_url = next_query_url['href']
 
- 
-
-            # Lets move this to try catch block 
-            # structures = [Structure(entry) for entry in data["data"]]
-
+        # Only if query was successful we parse the data.
             for entry in data["data"]:
                 try:
                     structure = Structure(entry)
@@ -171,6 +167,8 @@ class OptimadeQuery:
                     pymatgen_structure.to(fmt="cif", filename=self.folder_path.joinpath(cifname), symprec=self.symprec)
                 except (ValueError, TypeError) as e:
                         print(f'Failed to convert {entry["id"]} to pymatgen structure..')
+        else:
+            print("No data returned from query, or query returned response other than 202. Finishing..")
 
         if next_query_url:
             self.query(next_query_url)
