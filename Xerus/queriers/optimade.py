@@ -46,6 +46,8 @@ class OptimadeQuery:
             self.extra_filter = " AND ".join([f"{key}{value}" for key, value in extra_filters.items()])
         else:
             self.extra_filter = None
+        # Headers to pass through requuests
+        self.headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
 
         self.elements = elements
         self.base_url = base_url
@@ -128,7 +130,7 @@ class OptimadeQuery:
         if not query_url:
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}&page_limit=10"
 
-        response = requests.get(query_url)
+        response = requests.get(query_url, headers=self.headers)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
         next_query_url = None
         if response.status_code == 404:
