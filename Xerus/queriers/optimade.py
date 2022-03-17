@@ -2,7 +2,6 @@
 on any crystal structure database that implements an [OPTIMADE API](https://optimade.org).
 
 """
-import itertools
 import logging
 import os
 import sys
@@ -70,28 +69,6 @@ class OptimadeQuery:
         return filter
 
     @property
-    def optimade_filter_explicit(self) -> str:
-        """Explicit optimade filter string in case that HAS ONLY has not being implemented.
-
-        Returns
-        -------
-        str
-            Returns the optimade string filter with an explicit written elements in case of HAS ONLY it is not implemented.
-        """
-        element_space = [e for n in range(1, len(self.elements) + 1) for e in itertools.combinations(self.elements, n)]
-        print(element_space)
-        optimade_filter_explicit = "filter="
-        filters = []
-        for space in element_space:
-            space_str = ','.join([f'"{e}"' for e in space])
-            filters += [f"(elements HAS ALL {space_str} AND nelements={len(space)})"]
-        
-        optimade_filter_explicit += "OR".join(filters)
-        if self.extra_filter is not None:
-            optimade_filter_explicit += f" AND {self.extra_filter}"
-        return optimade_filter_explicit
-
-    @property
     def optimade_filter_hasall(self) -> str:
         """Explicit optimade filter string in case that HAS ONLY has not being implemented.
 
@@ -124,32 +101,40 @@ class OptimadeQuery:
         return f'{meta["provider"]["prefix"].upper()}_{entry["id"]}.cif'
 
     def query(self, query_url: Union[str, None] = None) -> None:
-        if query_url:
-            print(f'Attempt to query {query_url}')
-        print("Querying......")
+
+        # Construct the query URL first
         if not query_url:
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}&page_limit=10"
 
+        # Make the request and get the response
         response = requests.get(query_url, headers=self.headers)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
         next_query_url = None
+        
+        # First handle the issues with the response
         if response.status_code == 404:
             raise ValueError("Query returned 404, check provider URL")
 
+        
+        if response.status_code == 403:
+            raise ConnectionRefusedError("Query returned 403. Check requests settings.")
+        
         if response.status_code == 501:
             # If the query returns 501 Not Implemented, assume it is the HAS ONLY which failed and try again with an explicit filter
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter_hasall}&{self.optimade_response_fields}&page_limit=10"
             # print(f"Retrying query with {query_url} ....")
             response = requests.get(query_url)
 
+        if response.status_code == 504:
+            raise ValueError("Query returned 504, try changing query filters..")
+        
         if response.status_code == 200:
             data = response.json()
             meta = data["meta"]
             if meta["more_data_available"]:
                 next_query_url = data["links"]["next"]
+                # Check if what is returned is dict or straight the URL
                 if isinstance(next_query_url, dict):
-                    # There might be some inconsitency between providers?..
-                    # print(f'Next query URL is a dictionary, trying to get the URL from the "href" key')
                     next_query_url = next_query_url['href']
 
         # Only if query was successful we parse the data.
@@ -170,7 +155,8 @@ class OptimadeQuery:
                 except (ValueError, TypeError) as e:
                         print(f'Failed to convert {entry["id"]} to pymatgen structure..')
         else:
-            print("No data returned from query, or query returned response other than 202. Finishing..")
+            print("Something else went wrong")
+            raise ValueError(f'Query return {response.status_code}.....')
 
         if next_query_url:
             self.query(next_query_url)
