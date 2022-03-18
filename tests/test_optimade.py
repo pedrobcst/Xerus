@@ -8,7 +8,6 @@ import shutil
 
 import pytest
 import requests
-
 from Xerus.queriers.optimade import OptimadeQuery
 
 elements_list = ['Ho', 'B']
