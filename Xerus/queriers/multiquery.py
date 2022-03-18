@@ -18,21 +18,19 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import os
 import json
-import sys
+import os
 import shutil
+import sys
 from pathlib import Path
 from typing import List
 
 from Xerus.db.localdb import LocalDB
-from Xerus.queriers.mp import querymp
-from Xerus.queriers.cod import CODQuery
 from Xerus.queriers.aflow import AFLOWQuery
-from Xerus.queriers.oqmd import OQMDQuery
+from Xerus.queriers.cod import CODQuery
+from Xerus.queriers.mp import querymp
 from Xerus.queriers.optimade import OptimadeQuery
-from Xerus.utils.cifutils import standarize, make_system, rename_multicif, get_provider
-
+from Xerus.queriers.oqmd import OQMDQuery
 from Xerus.utils.cifutils import (get_provider, make_system, rename_multicif,
                                   standarize)
 
@@ -181,10 +179,10 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
         ## lets resync here the obtained files to check with the database..
     ## TEST CIFS ##
 
-    return 0
+    # return 0
     print("Testing, uploading and deleting cifs...")
     #cmd = 'python ' +os.sep + str(os.path.join(proj_path,'test_cif.py'))
-    cmd = "python " + str(os.path.join(abs_path, "tcif.py"))
+    cmd = "python " + str(os.path.join(abs_path, "test_runner.py"))
     print(cmd)
     os.system(cmd)
 
@@ -192,6 +190,7 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     print("Uploading database with cifs..")
     data = load_json(os.path.join(abs_path,'queried_cifs','cif.json'))
     print(len(data))
+    return 0
     if len(data) == 0:
         if resync:
             add_dummy = False
