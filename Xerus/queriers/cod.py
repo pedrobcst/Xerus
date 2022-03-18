@@ -24,6 +24,8 @@ from itertools import combinations
 from pathlib import Path
 from typing import List, Tuple
 
+import requests
+
 from Xerus.utils.cifutils import rename_multicif
 from Xerus.settings.settings import REQUESTS_TIMEOUT
 
