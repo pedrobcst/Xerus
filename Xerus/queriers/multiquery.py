@@ -104,8 +104,8 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     """
     query_type = make_system(standarize(element_list))
     td=[]
-    if dbhandler.check_system(query_type) and not resync:
-        return "Asked to query {}, but already present in database".format(query_type)
+    # if dbhandler.check_system(query_type) and not resync:
+    #     return "Asked to query {}, but already present in database".format(query_type)
 
     cod_path = str(os.path.join(abs_path, "cod_dump")) + os.sep
     mp_path = os.path.join(abs_path, "mp_dump")
@@ -180,6 +180,8 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
                 os.remove(path) # remove file if already in db
         ## lets resync here the obtained files to check with the database..
     ## TEST CIFS ##
+
+    return 0
     print("Testing, uploading and deleting cifs...")
     #cmd = 'python ' +os.sep + str(os.path.join(proj_path,'test_cif.py'))
     cmd = "python " + str(os.path.join(abs_path, "tcif.py"))

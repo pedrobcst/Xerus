@@ -18,13 +18,15 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from pathlib import Path
-import os, sys
-from pymatgen import Composition
-from typing import List, Tuple
 import json
+import os
 import re
+import sys
+from pathlib import Path
+from typing import Any, List, Tuple
+
 import pandas as pd
+from pymatgen import Composition
 
 # Regex for finding numbers
 number = r'-?\d+\.?\d*'
@@ -212,3 +214,18 @@ def sort_and_reset(df: pd.DataFrame, by: str ="Cij") -> pd.DataFrame:
     df = df.sort_values(by=by, ascending=False)
     df = df.reset_index(drop=True)
     return df
+
+
+def chunk_list(lst: List[Any], n: int) -> List:
+    """
+    Helper function to chunk a list into n chunks.
+    Parameters
+    ----------
+    lst : A list to be chunked
+    n : The number of chunks
+
+    Returns
+    -------
+    A list of n chunks
+    """
+    return [lst[i::n] for i in range(n) if len(lst[i::n]) > 0]

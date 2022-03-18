@@ -117,7 +117,7 @@ def simulate_pattern(filename: str, instr_params:str = INSTR_PARAMS, tmin: float
         gpx.histogram(0).Export("dummy", ".csv", "refl")  # export reflections to dummy
         if y.std() < threshold:
             status = -1
-    except (KeyError, IndexError) as e:
+    except (KeyError, IndexError, AttributeError) as e:
         return -1  
     return 1
 
