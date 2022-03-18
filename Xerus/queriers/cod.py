@@ -18,12 +18,12 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-from itertools import combinations
-import requests
 import os
 import sys
+from itertools import combinations
 from pathlib import Path
 from typing import List, Tuple
+
 from Xerus.utils.cifutils import rename_multicif
 from Xerus.settings.settings import REQUESTS_TIMEOUT
 
@@ -78,8 +78,9 @@ class CODQuery(object):
         element_string = "&".join(['el' + str(i + 1) + '=' + element_list[i] for i in range(0, len(element_list))])
         strictmax = len(element_list)
         strictmin = self.minn
-        query_url = self.base_url + element_string + "&strictmin=" + str(strictmin) + "&strictmax=" + str(
-            strictmax) + "&format=" + str(self.file_format)
+        # query_url = self.base_url + element_string + "&strictmin=" + str(strictmin) + "&strictmax=" + str(
+            # strictmax) + "&format=" + str(self.file_format)
+        query_url = f"{self.base_url}{element_string}&strictmin={strictmin}&strictmax={strictmax}&maxv=10000&format={self.file_format}"
 
         if element_string == "el1=O" or element_string == "el1=C&el2=O":
             print("Oxygen only or Carbon and Oxygen only found. Skipping this query")

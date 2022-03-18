@@ -129,11 +129,11 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     AFLOWQuery(element_list, outfolder=aflow_path).query()
     td.append(aflow_path)
 
-    # OQMD Query
-    print("Querying OQMD...")
-    oqmd = OQMDQuery(element_list=element_list, dumpfolder=oqmd_path)
-    oqmd.query()
-    td.append(oqmd_path)
+    # # OQMD Query
+    # print("Querying OQMD...")
+    # oqmd = OQMDQuery(element_list=element_list, dumpfolder=oqmd_path)
+    # oqmd.query()
+    # td.append(oqmd_path)
     
 
     # TODO: Evaluate on how to implement each querier through optimade via the generic OptimadeQuery interface
@@ -151,11 +151,15 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     #     elements=element_list,
     #     folder_path=Path("optimade")
     # )
-    # oqmd_optimade = OptimadeQuery(
-    #     base_url="https://oqmd.org/optimade/v1/",
-    #     elements=element_list,
-    #     folder_path=Path("optimade")
-    # )
+    print(f"Querying OQMD through OPTIMADE....")
+    oqmd_optimade = OptimadeQuery(
+        base_url="https://oqmd.org/optimade/v1",
+        elements=element_list,
+        folder_path=Path(oqmd_path),
+        extra_filters={"_oqmd_stability": "<0.05"}
+    )
+    oqmd_optimade.query()
+    td.append(oqmd_path)
 
     # td.append(Path("optimade"))
 
