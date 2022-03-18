@@ -19,24 +19,20 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
+import json
 import sys
+import shutil
 from pathlib import Path
 from typing import List
 
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
-import json
-import os
-import shutil
-from pathlib import Path
-
 from Xerus.db.localdb import LocalDB
-from Xerus.queriers.aflow import AFLOWQuery
-from Xerus.queriers.cod import CODQuery
 from Xerus.queriers.mp import querymp
-from Xerus.queriers.optimade import OptimadeQuery
+from Xerus.queriers.cod import CODQuery
+from Xerus.queriers.aflow import AFLOWQuery
 from Xerus.queriers.oqmd import OQMDQuery
+from Xerus.queriers.optimade import OptimadeQuery
+from Xerus.utils.cifutils import standarize, make_system, rename_multicif, get_provider
+
 from Xerus.utils.cifutils import (get_provider, make_system, rename_multicif,
                                   standarize)
 
@@ -68,7 +64,8 @@ def movecifs(dump_folders: List[str] = dump_folders, test_folder: os.PathLike = 
         if os.path.isdir(folder):
             files = os.listdir(folder)
             for file in files:
-                shutil.move(os.path.join(folder,file), test_folder)
+                if not os.path.exists(os.path.join(test_folder, file)):
+                    shutil.move(os.path.join(folder, file), test_folder)
             shutil.rmtree(folder)
 
 

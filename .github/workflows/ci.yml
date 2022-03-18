@@ -1,0 +1,56 @@
+name: CI tests
+
+on:
+  pull_request:
+  push:
+    branches:
+    - master
+    - 'push-action/**'
+
+# Cancel running workflows when additional changes are pushed
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-using-a-fallback-value
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        python-version: ['3.8']
+
+    services:
+      mongo:
+        image: mongo:4
+        ports:
+        - 27017:27017
+    
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install OS deps
+      run: |
+        sudo apt install -y subversion libgfortran4
+
+    - name: Install Python package and dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -U setuptools wheel
+        pip install -e .
+
+    - name: Run simple import test from outside package dir
+      working-directory: /
+      run: |
+        python -c "import Xerus"
+
+    - name: Run all tests
+      run: pytest -rs -vvv -m "not user"

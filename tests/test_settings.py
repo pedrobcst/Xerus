@@ -1,8 +1,7 @@
 # Test for configuration & GSAS Binaries
 import sys, os
 from pathlib import Path
-projectpath = Path(os.getcwd()).parent.as_posix() + os.sep
-sys.path.append(projectpath)
+from . import INSTALL_PATH
 from Xerus.settings.settings import TEST_XRD, INSTR_PARAMS, GSAS2_BIN
 sys.path.append(GSAS2_BIN)
 import GSASIIscriptable as G2sc
@@ -16,7 +15,7 @@ import pytest
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
-# Test connection to local database
+@pytest.mark.user
 def test_dbconn():
     """
     Tests connection to localdatabase
@@ -34,10 +33,10 @@ def test_dbconn():
             return False
     assert connect() == True, "CIF Database connection failed"
 
-# Test mp connection
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.user
 def test_mpconn():
     """
     Tests Materials Project Connection
@@ -53,7 +52,6 @@ def test_mpconn():
         assert False, "Failed to connect to MP Project"
 
 
-# Test gsas ii settings
 @pytest.mark.filterwarnings('ignore::RuntimeWarning')
 @pytest.mark.filterwarnings('ignore::UserWarning')
 @pytest.mark.filterwarnings('ignore::DeprecationWarning')
@@ -73,7 +71,7 @@ def test_gsas2settings():
         # Add histogram
         histogram = gpx.add_powder_histogram(datafile=TEST_XRD, iparams=INSTR_PARAMS)
         # Add test cif
-        gpx.add_phase(phasefile="cif/HoB2_MP_mp-2267.cif", phasename="HoB2 test", histograms=[histogram])
+        gpx.add_phase(phasefile=INSTALL_PATH / "cif/HoB2_MP_mp-2267.cif", phasename="HoB2 test", histograms=[histogram])
 
         # Refine:
         refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True},

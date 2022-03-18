@@ -37,6 +37,7 @@ GSAS2_BIN = os.path.join(project_path, 'GSASII') # bundled GSAS II
 TEST_XRD = os.path.join(project_path,config['gsas2']['testxrd'])
 MP_API_KEY = config['mp']['apikey']
 
+REQUESTS_TIMEOUT = 9.1
 
 if config['mongodb']['host'] == 'localhost':
     DB_CONN = 'localhost'

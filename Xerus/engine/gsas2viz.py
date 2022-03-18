@@ -21,9 +21,6 @@
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 import seaborn as sns
 import numpy as np
 import plotly.express as px

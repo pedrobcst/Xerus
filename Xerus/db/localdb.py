@@ -22,14 +22,11 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
 from Xerus.utils.cifutils import write_cif, make_system_types
 from Xerus.utils.tools import create_folder, load_json
 import pandas as pd
 import os
-from pymongo import MongoClient
+import pymongo
 from pymongo.errors import ConnectionFailure
 from typing import Tuple, List
 from Xerus.settings.settings import DB_CONN
@@ -55,7 +52,7 @@ class LocalDB:
 
 
     def __init__(self, DB_NAME="CIF", COLLECTION_NAME="cifs"):
-        self.client = MongoClient(DB_CONN)  # connect to local database
+        self.client = pymongo.MongoClient(DB_CONN)  # connect to local database
         self.DB_NAME = DB_NAME
         self.COLLECTION_NAME = COLLECTION_NAME
         try:
