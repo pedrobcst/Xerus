@@ -83,6 +83,7 @@ def test_oqmd_response_status():
     headers = oqmd_query.headers
     query_url = f"{oqmd_query.base_url}/{oqmd_query.optimade_endpoint}?{oqmd_query.optimade_filter}&{oqmd_query.optimade_response_fields}&page_limit=10"
     assert requests.get(query_url, headers=headers).status_code == 200
+    shutil.rmtree("optimade_oqmd_1")
 
 def test_cod_response_status():
     """
@@ -97,4 +98,5 @@ def test_cod_response_status():
     headers = cod_query.headers
     query_url = f"{cod_query.base_url}/{cod_query.optimade_endpoint}?{cod_query.optimade_filter_hasall}&{cod_query.optimade_response_fields}&page_limit=10"
     assert requests.get(query_url, headers=headers).status_code == 200
+    shutil.rmtree("optimade_cod")
 
