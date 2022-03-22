@@ -22,9 +22,8 @@ from __future__ import annotations
 
 import os
 import sys
-from pathlib import Path
-
 from multiprocessing import Pool
+from pathlib import Path
 from typing import Any, List, Tuple, Union
 
 import numpy as np
@@ -39,22 +38,14 @@ from Xerus.engine.gsas2viz import plot_all_gpx, plot_gpx
 from Xerus.engine.gsas2wrap import GSASRefiner
 from Xerus.readers.datareader import DataReader
 from Xerus.settings.settings import GSAS2_BIN, INSTR_PARAMS
-from Xerus.similarity.pattern_removal import (
-    combine_pos,
-    run_correlation_analysis,
-    run_correlation_analysis_riet,
-)
+from Xerus.similarity.pattern_removal import (combine_pos,
+                                              run_correlation_analysis,
+                                              run_correlation_analysis_riet)
 from Xerus.similarity.visualization import make_plot_all, make_plot_step
 from Xerus.utils.cifutils import make_system, make_system_types
 from Xerus.utils.preprocessing import remove_baseline, standarize_intensity
-from Xerus.utils.tools import (
-    blockPrinting,
-    create_folder,
-    group_data,
-    load_json,
-    make_offset,
-    normalize_formula,
-)
+from Xerus.utils.tools import (blockPrinting, create_folder, group_data,
+                               load_json, make_offset, normalize_formula)
 from Xerus.utils.tools import plotly_add as to_add
 from Xerus.utils.tools import save_json
 
@@ -1080,3 +1071,42 @@ class XRay:
             return "Please run optimizer first."
         else:
             self.optimizer.export_results(outfolder=outfolder)
+
+
+    def load_results(self, filename: str) -> None:
+        """Load past run results.
+           This allows to use Xerus plotting functions to investigate the results, or re-run the analysis
+           with different conditions.
+           Also allows to easily start optimization if necessary
+
+        Parameters
+        ----------
+        filename : str
+            Path to a 'Refinement Results.csv' of an old run
+        """
+        def convert_data(data: str) -> Union[str, List]:
+            """Helper function to convert a string into the correct data structure..
+
+            Parameter
+            ----------
+            data : str
+                A string representation of the data.
+
+            Returns
+            -------
+            Any[str, List]
+                Returns the correct representation of a string into the correct structure.
+                For example "['HoB2', 'HoB4']" (str) -> ['HoB2', 'HoB4'] (List[str])
+            """
+            if not isinstance(data, str):
+                return data
+            try:
+                return eval(data)
+            except (NameError, SyntaxError, TypeError) as e:
+                return data
+
+        # Read the data and convert
+        data = pd.read_csv(filename)
+        self.results = data.applymap(convert_data)
+        
+    
