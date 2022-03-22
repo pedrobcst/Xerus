@@ -1,11 +1,13 @@
-import pytest
 import shutil
 import unittest.mock
-import pymatgen
-import monty.serialization
+
 import mongomock
-from . import INSTALL_PATH
+import monty.serialization
+import pymatgen
+import pytest
 from Xerus import XRay
+
+from . import INSTALL_PATH
 
 
 @pytest.fixture
@@ -89,10 +91,7 @@ def test_boxmethod(working_folder, mock_mp_rester, mock_mongo):
     assert r.results.name.iat[0] == ['HoB2', 'HoB4']
     shutil.rmtree(r.working_folder)
 
-
-@pytest.mark.filterwarnings('ignore::RuntimeWarning')
-@pytest.mark.filterwarnings('ignore::UserWarning')
-@pytest.mark.filterwarnings('ignore::DeprecationWarning')
+@pytest.mark.skip(reason="Experimental feature.")
 def test_residualmethod(working_folder, mock_mp_rester, mock_mongo):
     """
     Test rietveld method with n_runs=2
