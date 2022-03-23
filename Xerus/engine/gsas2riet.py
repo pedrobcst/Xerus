@@ -21,7 +21,6 @@
 import os
 import sys
 from pathlib import Path
-
 from typing import List, Tuple, Union
 
 import pandas as pd
@@ -283,7 +282,6 @@ def simulate_spectra(cifpath: str, tmin: float, tmax: float, step: float, outfol
 
 
 
-@blockPrinting
 def run_gsas(powder_data: str, cif_name: str, phasename: str,
              limits: Tuple[float, float] = (10., 70.) ,max_cyc: int = 8,
              instr_params: str = INSTR_PARAMS) -> Tuple[float, str]:
@@ -319,24 +317,28 @@ def run_gsas(powder_data: str, cif_name: str, phasename: str,
     gpx.data['Controls']['data']['max cyc'] = max_cyc
     hist1 = gpx.add_powder_histogram(datafile=powder_data,
                                      iparams=instr_params)
-    phase0 = gpx.add_phase(cif_name, phasename=phasename, histograms=[hist1])
-    hist1.data['Instrument Parameters'][0]['I(L2)/I(L1)'] = [0.5, 0.5, 0]
+    try:                                
+        phase0 = gpx.add_phase(cif_name, phasename=phasename, histograms=[hist1])
+        hist1.data['Instrument Parameters'][0]['I(L2)/I(L1)'] = [0.5, 0.5, 0]
+    except:
+        return -1
+    return 1
 
-    # Set to use iso
-    #for val in phase0.data['Atoms']:
-    #    val[9] = 'I'
-    refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True}, "Scale": True}}
-    refdict1 = {"set": {"Cell": True, 'Sample Parameters': ['DisplaceX']}}
-    # refdict4a = {"set": {'Sample Parameters': ['DisplaceX']}}
-    refdict_ori = {"set": {"Pref.Ori.": True}}
-    refdict4b = {"set": {"Atoms": {"all": "XU"}}}
-    refdict5a = {"set": {'Limits': limits}}
-    refdict5c = {"set": {'Instrument Parameters': ['U', 'V', 'W']}}
+    # # Set to use iso
+    # #for val in phase0.data['Atoms']:
+    # #    val[9] = 'I'
+    # refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True}, "Scale": True}}
+    # refdict1 = {"set": {"Cell": True, 'Sample Parameters': ['DisplaceX']}}
+    # # refdict4a = {"set": {'Sample Parameters': ['DisplaceX']}}
+    # refdict_ori = {"set": {"Pref.Ori.": True}}
+    # refdict4b = {"set": {"Atoms": {"all": "XU"}}}
+    # refdict5a = {"set": {'Limits': limits}}
+    # refdict5c = {"set": {'Instrument Parameters': ['U', 'V', 'W']}}
 
-    dictList = [refdict0, refdict1, refdict_ori, refdict5a, refdict4b, refdict5c]
-    gpx.do_refinements(dictList)
-    #os.remove(gpx_name)
-    return HistStats(gpx), gpx_name
+    # dictList = [refdict0, refdict1, refdict_ori, refdict5a, refdict4b, refdict5c]
+    # gpx.do_refinements(dictList)
+    # #os.remove(gpx_name)
+    # return HistStats(gpx), gpx_name
 
 
 @blockPrinting
