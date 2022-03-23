@@ -239,16 +239,15 @@ def simulate_spectra(cifpath: str, tmin: float, tmax: float, step: float, outfol
         x = gpx.histogram(0).getdata("x")  # Grab theta
         y = gpx.histogram(0).getdata("ycalc")  # Grab ntesntieis
         simulated_data = pd.DataFrame(data=zip(x, y), columns=["theta", "int"])
+        pwdr = gpx.histograms()[0]
+        phase = list(pwdr.reflections().keys())[0]
+        reflection_dict = pwdr.reflections()[phase]['RefList']
+        reflections = pd.DataFrame(data=[parse_reflections_array(array) for array in reflection_dict], columns=wanted)
         # gpx.histogram(0).Export(cifname, ".csv", "refl")  # export reflections to dummy
     except:
         # self._notrun.append(cifpath)
         sys.stdout = old_stdout
         return False, False, False
-
-    pwdr = gpx.histograms()[0]
-    phase = list(pwdr.reflections().keys())[0]
-    reflection_dict = pwdr.reflections()[phase]['RefList']
-    reflections = pd.DataFrame(data=[parse_reflections_array(array) for array in reflection_dict], columns=wanted)
 
     # Messy below. Avoid get caught by an OSError due to race conditions of parallel processing.
     if not os.path.isdir(outfolder):
