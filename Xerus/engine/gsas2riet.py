@@ -282,10 +282,14 @@ def simulate_spectra(cifpath: str, tmin: float, tmax: float, step: float, outfol
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 @blockPrinting
 =======
 
 >>>>>>> Changed testing to cif reading only.
+=======
+@blockPrinting
+>>>>>>> readd blockprinting decorator
 def run_gsas(powder_data: str, cif_name: str, phasename: str,
              limits: Tuple[float, float] = (10., 70.) ,max_cyc: int = 8,
              instr_params: str = INSTR_PARAMS) -> Tuple[float, str]:
