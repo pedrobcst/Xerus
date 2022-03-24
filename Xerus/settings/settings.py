@@ -19,9 +19,9 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
-from pathlib import Path
-from configparser import ConfigParser
 import urllib.parse
+from configparser import ConfigParser
+from pathlib import Path
 
 abs_path = Path(__file__).parent
 project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep
@@ -37,7 +37,7 @@ GSAS2_BIN = os.path.join(project_path, 'GSASII') # bundled GSAS II
 TEST_XRD = os.path.join(project_path,config['gsas2']['testxrd'])
 MP_API_KEY = config['mp']['apikey']
 
-REQUESTS_TIMEOUT = 9.1
+REQUESTS_TIMEOUT = 15.0
 
 if config['mongodb']['host'] == 'localhost':
     DB_CONN = 'localhost'
