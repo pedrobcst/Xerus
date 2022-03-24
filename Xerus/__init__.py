@@ -938,6 +938,7 @@ class XRay:
                     s_info=simul,
                     type=mode,
                     outfolder=self.working_folder,
+                    **kwargs
                 )
 
     def initialize_optimizer(self, index: Any[List[int], int]) -> XRay:
