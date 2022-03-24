@@ -18,21 +18,17 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import os
 import json
-import sys
+import os
 import shutil
+import sys
 from pathlib import Path
 from typing import List
 
 from Xerus.db.localdb import LocalDB
-from Xerus.queriers.mp import querymp
 from Xerus.queriers.cod import CODQuery
-from Xerus.queriers.aflow import AFLOWQuery
-from Xerus.queriers.oqmd import OQMDQuery
+from Xerus.queriers.mp import querymp
 from Xerus.queriers.optimade import OptimadeQuery
-from Xerus.utils.cifutils import standarize, make_system, rename_multicif, get_provider
-
 from Xerus.utils.cifutils import (get_provider, make_system, rename_multicif,
                                   standarize)
 
@@ -126,8 +122,8 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     cod.query_one(element_list=element_list, rename=True)
 
     # AFLOW query
-    AFLOWQuery(element_list, outfolder=aflow_path).query()
-    td.append(aflow_path)
+    # AFLOWQuery(element_list, outfolder=aflow_path).query()
+    # td.append(aflow_path)
 
     # # OQMD Query
     # print("Querying OQMD...")
