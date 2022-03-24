@@ -21,18 +21,18 @@
 import os
 import sys
 from pathlib import Path
-import seaborn as sns
+from typing import List, Union
+
 import numpy as np
-import plotly.express as px
 import pandas as pd
-from typing import Union, List
+import plotly.express as px
+import seaborn as sns
 from matplotlib import pyplot as plt
+from plotly.graph_objects import Figure
+from Xerus.engine.gsas2utils import get_plot_data
 from Xerus.settings.mplibcfg import Mplibcfg
 from Xerus.utils.tools import formula_to_latex
 from Xerus.utils.tools import plotly_add as to_add
-from Xerus.engine.gsas2utils import get_plot_data
-from plotly.graph_objects import Figure
-
 
 # sys.path.append(GSAS2_BIN)
 # import GSASIIscriptable as G2sc  # Ignore Warning
@@ -83,7 +83,7 @@ def plot_all_gpx(path: str, outfolder: str = "fig/", fmt: str = ".jpeg", engine:
 
 
 def plot_gpx(path: str, offset: float = 0.2, outfolder: str = "curr", fmt: str = ".jpg", save: bool = True,
-             engine: str = "matplotlib", type: str = "bragg", s_info: List[pd.DataFrame] = None) -> Union[Figure, None]:
+             engine: str = "matplotlib", type: str = "bragg", s_info: List[pd.DataFrame] = None, **kwargs) -> Union[Figure, None]:
     """
     Plot a .gpx file using matplotlib or plotly.
 
@@ -128,7 +128,7 @@ def plot_gpx(path: str, offset: float = 0.2, outfolder: str = "curr", fmt: str =
                                   outfolder=outfolder,
                                   save=save)
         else:
-            fig = plot_gpx_plotly_simul(path=path, offset=offset,outfolder=outfolder,save=save,s_info=s_info)
+            fig = plot_gpx_plotly_simul(path=path, offset=offset,outfolder=outfolder,save=save,s_info=s_info, **kwargs)
         return fig
     else:
         raise NotImplementedError("Not implemented.")
@@ -158,6 +158,7 @@ def plot_gpx_mplib(path: str, offset: float = 0.2, outfolder: str = "curr", fmt:
     None
     """
     import gc
+
     ## style configurations
     sns.set()
     sns.set_style("darkgrid", {"patch.edgecolor": "black", "axes.edgecolor": "black"})
@@ -342,7 +343,7 @@ def plot_gpx_plotly(path: str, offset: float = 0.3, outfolder: str = "curr", sav
     return fig
 
 
-def plot_gpx_plotly_simul(path: str, s_info: List[pd.DataFrame], offset: float = 0.3, outfolder: str = "curr", save: bool = False) -> Union[Figure, None]:
+def plot_gpx_plotly_simul(path: str, s_info: List[pd.DataFrame], offset: float = 0.3, outfolder: str = "curr", save: bool = False, width = 1000, height = 600) -> Union[Figure, None]:
     """
     Parse a GPX Project and plot the results using Plotly.
     This function just plots the full simulation of the patterns instead of using the bragg position ticks "|" as indication
@@ -400,8 +401,8 @@ def plot_gpx_plotly_simul(path: str, s_info: List[pd.DataFrame], offset: float =
                          "label": title
                      },
                      title=os.path.basename(path),
-                     width=1000,
-                     height=600)
+                     width=width,
+                     height=height)
 
     # Setup hover template for main plot
     t = fig.data[0].hovertemplate

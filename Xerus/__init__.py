@@ -877,6 +877,7 @@ class XRay:
         engine: str = "plotly",
         mode: str = "simul",
         save: bool = False,
+        **kwargs
     ) -> Any[None, object]:
         """
         Plot a result of a specific index of the results dataframe
