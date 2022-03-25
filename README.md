@@ -10,6 +10,8 @@ Paper
 This is the main repository for
   * Baptista de Castro, P., Terashima, K., Esparza Echevarria, M.G., Takeya, H. and Takano, Y. (2022), XERUS: An Open-Source Tool for Quick XRD Phase Identification and Refinement Automation. Adv. Theory Simul. 2100588. https://doi.org/10.1002/adts.202100588
 
+For the Xerus version that was published in the paper, please refer to release 1.1 [here](https://github.com/pedrobcst/Xerus/releases/tag/v1.0r1)
+
 Introduction
 ============
 Welcome to the _Xerus_ project. Xerus is an open-source python wrapper / plugin around the GSASII Scriptable package,
