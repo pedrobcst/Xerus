@@ -4,15 +4,11 @@ on any crystal structure database that implements an [OPTIMADE API](https://opti
 """
 import logging
 import os
-import sys
 from pathlib import Path
 from typing import List, Union
 
-project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep # so convoluted..
-if project_path not in sys.path:
-    sys.path.append(project_path)
-
 import requests
+from Xerus.settings.settings import REQUESTS_TIMEOUT
 
 from optimade.adapters import Structure
 
@@ -107,7 +103,7 @@ class OptimadeQuery:
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter}&{self.optimade_response_fields}&page_limit=10"
 
         # Make the request and get the response
-        response = requests.get(query_url, headers=self.headers)
+        response = requests.get(query_url, headers=self.headers, timeout=REQUESTS_TIMEOUT)
         logging.info("Query %s returned status code %s", query_url, response.status_code)
         next_query_url = None
         
@@ -123,7 +119,7 @@ class OptimadeQuery:
             # If the query returns 501 Not Implemented, assume it is the HAS ONLY which failed and try again with an explicit filter
             query_url = f"{self.base_url}/{self.optimade_endpoint}?{self.optimade_filter_hasall}&{self.optimade_response_fields}&page_limit=10"
             # print(f"Retrying query with {query_url} ....")
-            response = requests.get(query_url)
+            response = requests.get(query_url, headers=self.headers, timeout=REQUESTS_TIMEOUT)
 
         if response.status_code == 504:
             raise ValueError("Query returned 504, try changing query filters..")

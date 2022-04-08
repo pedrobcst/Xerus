@@ -19,21 +19,27 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import json
 # Query AFLOW using AFLUX
 import os
+import shutil
 import sys
 from pathlib import Path
-import requests
-from urllib.request import urlopen
-from pymatgen.io.cif import CifParser, CifWriter
-import json
-import shutil
 from typing import List, Tuple
+from urllib.request import urlopen
+
+import requests
+from pymatgen.io.cif import CifParser, CifWriter
 from Xerus.db.localdb import LocalDB
 from Xerus.utils.cifutils import get_ciflist
 
+
 class AFLOWQuery:
     """
+
+    THIS QUERIER IS DEPRECATED AND WILL BE REMOVE FROM NEXT RELEASE.
+
+    
     Queryer for downloading CIFS from AFLOW based on the AFLUX API.
     Obtain "P1" CIFS and symmetrize using pymatgen (spglib backend)
     The P1 cifs are saved into a different database.

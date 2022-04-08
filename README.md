@@ -10,6 +10,8 @@ Paper
 This is the main repository for
   * Baptista de Castro, P., Terashima, K., Esparza Echevarria, M.G., Takeya, H. and Takano, Y. (2022), XERUS: An Open-Source Tool for Quick XRD Phase Identification and Refinement Automation. Adv. Theory Simul. 2100588. https://doi.org/10.1002/adts.202100588
 
+For the Xerus version that was published in the paper, please refer to release 1.0r1 [here](https://github.com/pedrobcst/Xerus/releases/tag/v1.0r1)
+
 Introduction
 ============
 Welcome to the _Xerus_ project. Xerus is an open-source python wrapper / plugin around the GSASII Scriptable package,
@@ -72,7 +74,7 @@ conda create -n Xerus python==3.8 anaconda
 conda activate Xerus
 git clone http://www.github.com/pedrobcst/Xerus/
 cd Xerus
-pip install -r requirements.txt
+pip install -e .
 ```
 > :warning: You might have trouble installing pymatgen if gcc is not present in your system. You can them for example do sudo apt install g++ to install in Ubuntu, then run pip install -r requirements.txt again. 
 
@@ -109,7 +111,7 @@ If all the above steps were done sucessfuly (pip install, mongo running [locally
 please do the following:
 ```bash
 cd tests
-pytest
+pytest -vvv
 ```
 If all tests sucessfuly pass, _Xerus_ should be ready for use.
 
@@ -118,7 +120,9 @@ If all tests sucessfuly pass, _Xerus_ should be ready for use.
 
 - To learn how to use Xerus, please follow the Notebook, located at Examples/Examples.ipynb
 
-> :warning: Make sure that before running the examples, you have started the MongoDB server. 
+> :warning: Make sure that before running the examples, you have started the MongoDB server.
+
+> Note: We are developing an ease of use Streamlit interface in [Xerus-streamlit](https://www.github.com/pedrobcst/Xerus-streamlit) repository. Contriubtions are welcome.
 
 # Citing
 If you use _Xerus_ please __also__ cite the following papers:

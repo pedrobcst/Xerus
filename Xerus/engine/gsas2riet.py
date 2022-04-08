@@ -280,13 +280,6 @@ def simulate_spectra(cifpath: str, tmin: float, tmax: float, step: float, outfol
     return simul_out, refl_out, True
 
 
-
-
-
-
-
-
-
 @blockPrinting
 def run_gsas(powder_data: str, cif_name: str, phasename: str,
              limits: Tuple[float, float] = (10., 70.) ,max_cyc: int = 8,
@@ -330,23 +323,7 @@ def run_gsas(powder_data: str, cif_name: str, phasename: str,
         return -1
     return 1
 
-    # # Set to use iso
-    # #for val in phase0.data['Atoms']:
-    # #    val[9] = 'I'
-    # refdict0 = {"set": {"Background": {"no. coeffs": 6, "refine": True}, "Scale": True}}
-    # refdict1 = {"set": {"Cell": True, 'Sample Parameters': ['DisplaceX']}}
-    # # refdict4a = {"set": {'Sample Parameters': ['DisplaceX']}}
-    # refdict_ori = {"set": {"Pref.Ori.": True}}
-    # refdict4b = {"set": {"Atoms": {"all": "XU"}}}
-    # refdict5a = {"set": {'Limits': limits}}
-    # refdict5c = {"set": {'Instrument Parameters': ['U', 'V', 'W']}}
-
-    # dictList = [refdict0, refdict1, refdict_ori, refdict5a, refdict4b, refdict5c]
-    # gpx.do_refinements(dictList)
-    # #os.remove(gpx_name)
-    # return HistStats(gpx), gpx_name
-
-
+  
 @blockPrinting
 def quick_gsas(powder_data: str, cif_name: str, phasename: str, outfolder: str, max_cyc: int = 8,
                instr_params: str = INSTR_PARAMS, name: bool = False, ori: bool = False) -> Union[Tuple[float, str], str]:
