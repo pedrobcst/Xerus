@@ -37,13 +37,13 @@
 #     information of all currently tested cifs and their statuses. Thus, when the script restarts, he will started from the
 #     next non-tested pattern (that is broken pattern position +1)
 
+import json
 import os
 import sys
 from pathlib import Path
-from Xerus.engine.gsas2riet import run_gsas, simulate_pattern
-import json
-from Xerus.settings.settings import TEST_XRD, INSTR_PARAMS
 
+from Xerus.engine.gsas2riet import run_gsas, simulate_pattern
+from Xerus.settings.settings import INSTR_PARAMS, TEST_XRD
 
 instr_params = INSTR_PARAMS
 powder_data = TEST_XRD
@@ -53,6 +53,7 @@ cif_name = "cif.json"
 datapath = os.path.join(cif_folder,cif_name)
 from tqdm import tqdm
 from Xerus.utils.cifutils import get_ciflist
+
 if not os.path.exists(datapath):
     get_ciflist(str(cif_folder) + os.sep, "r", True)
 with open(datapath, "r") as fp:
@@ -84,34 +85,41 @@ if __name__ == "__main__":
         ss = entry['simul_status']
         gs = entry['gsas_status']
         if not ss['tested']:
-            print("Testing simulation of {}".format(cifpath))
-            status = simulate_pattern(filename=cifpath,
-                                                   instr_params=instr_params)
+            # print("Testing simulation of {}".format(cifpath))
+            # status = simulate_pattern(filename=cifpath,
+                                                #    instr_params=instr_params)
             data[i]['simul_status']['tested'] = True
-            data[i]['simul_status']['status'] = status
+            data[i]['simul_status']['status'] = 1
         if not gs['tested']:
-            try:
-                print("We are going to try to run {} in GSASII".format(cifpath))
-                run_gsas(powder_data=powder_data,
+            # try:
+            print("We are going to try to run {} in GSASII".format(cifpath))
+            result = run_gsas(powder_data=powder_data,
                          instr_params=instr_params,
                          phasename="Test.gpx",
                          cif_name=cifpath,
                          max_cyc=1)
-            except:
-                print("It broke!")
-                data[i]['gsas_status']['status'] = -1
-                data[i]['gsas_status']['tested'] = True
-                data[i]['ran'] = False
-                save_json(data)
-                # Restart script?
-                sys.stdout.flush()
-                python = sys.executable
-                os.execl(python, python, *sys.argv)
-            else:
-                print("PASS!")
-                data[i]['gsas_status']['status'] = 1
-                data[i]['gsas_status']['tested'] = True
+            data[i]['gsas_status']['tested'] = True
+            data[i]['gsas_status']['status'] = result
+            if result == 1:
                 data[i]['ran'] = True
+            else:
+                data[i]['ran'] = False
+
+            # except:
+            #     print("It broke!")
+            #     data[i]['gsas_status']['status'] = -1
+            #     data[i]['gsas_status']['tested'] = True
+            #     data[i]['ran'] = False
+            #     save_json(data)
+            #     # Restart script?
+            #     sys.stdout.flush()
+            #     python = sys.executable
+            #     os.execl(python, python, *sys.argv)
+            # else:
+    #             print("PASS!")
+    #             data[i]['gsas_status']['status'] = 1
+    #             data[i]['gsas_status']['tested'] = True
+    #             data[i]['ran'] = True
     save_json(data)
     ## clean up .lst, .gpx, .bak
     files = os.listdir(cif_folder)
