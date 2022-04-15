@@ -19,19 +19,19 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
+
 import os
+import shutil
 import sys
 from pathlib import Path
-from Xerus.utils.cifutils import write_cif, make_system_types
-from Xerus.utils.tools import create_folder, load_json
+from typing import List, Tuple
+
 import pandas as pd
-import os
 import pymongo
 from pymongo.errors import ConnectionFailure
-from typing import Tuple, List
 from Xerus.settings.settings import DB_CONN
-import shutil
-
+from Xerus.utils.cifutils import make_system_types, write_cif
+from Xerus.utils.tools import create_folder, load_json
 
 
 class LocalDB:
@@ -61,8 +61,14 @@ class LocalDB:
         except:
             raise ConnectionFailure
         self.database = self.client[self.DB_NAME]
+        # If collection does not exist yet, create it and create a unique ID for providers.
+        if self.COLLECTION_NAME not in self.database.list_collection_names():
+            self.database.create_collection(self.COLLECTION_NAME)
+            self.database[self.COLLECTION_NAME].create_index("id", unique=True)
         self.cif_meta = self.database[self.COLLECTION_NAME]
-        self.cif_p1 = self.database['AFLOW-P1']
+        
+        # This will be removed in the future.
+        # self.cif_p1 = self.database['AFLOW-P1']
 
     def check_system(self, system_type: str) -> bool:
         """
@@ -137,10 +143,15 @@ class LocalDB:
         data : array-like
             An array-like containing dictionaries with data for upload into the database
         """
-        self.cif_meta.insert_many(data)
+        # Ignore error due to duplicate keys (if we are ensuring uniqueness for provider ID).
+        try:
+            self.cif_meta.insert_many(data, ordered = False)
+        except pymongo.errors.BulkWriteError:
+            pass
 
 
-    def check_and_download(self, system_type: str) -> LocalDB:
+
+    def check_and_download(self, system_type: str, name : str) -> LocalDB:
         """
         Check for system type in the database. If it is missing, query providers and download the respective CIFs
         pertaining to that system.
@@ -152,6 +163,8 @@ class LocalDB:
             `system_type` is a string representation of the chemical system of elements. For example, for Ho and B containing
             materials, `system_type` would be equal to: "Ho-B". For constructing the string in correct manner, please refer
             to Xerus.utils.tools make_system_type function.
+        name: str
+            Data set name used for folder creation.
 
         Returns
         -------
@@ -160,10 +173,10 @@ class LocalDB:
         from Xerus.queriers.multiquery import multiquery
         if not self.check_system(system_type):
             elements = system_type.split("-")
-            multiquery(elements, max_num_elem=len(elements))
+            multiquery(elements, max_num_elem=len(elements), name = name)
         return self
 
-    def check_all(self, system_types: Tuple[str]) -> LocalDB:
+    def check_all(self, system_types: Tuple[str], name: str) -> LocalDB:
         """
         Check for a list of system types and download missing.
 
@@ -184,10 +197,10 @@ class LocalDB:
                 pass
             else:
                 print("Checking the following combination:{}".format(combination))
-                self.check_and_download(combination)
+                self.check_and_download(combination, name = name)
         return self
 
-    def get_cifs_and_write(self, element_list : List[str], outfolder: str, maxn: int, max_oxy: int = 2) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def get_cifs_and_write(self, element_list : List[str], name: str, outfolder: str, maxn: int, max_oxy: int = 2) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
 
         Automatically receives a list of elements and make `system_types`.
@@ -224,7 +237,7 @@ class LocalDB:
         folder_to_write = 'cifs/'
         final_path = os.path.join(outfolder, folder_to_write)
         queries = make_system_types(element_list, maxn)
-        self.check_all(queries)
+        self.check_all(queries, name = name)
 
         # check oxygen limit
         if max_oxy is not None:
@@ -274,7 +287,7 @@ class LocalDB:
 
         pipeline = [
             {"$group": {"_id": field, "count": {"$sum": 1}}},  # group by field and sum occurence of field
-            {"$match": {"count": {"$gte": 1}}}  # match to values of count > 1.
+            {"$match": {"count": {"$gt": 1}}}  # match to values of count > 1.
         ]
         return pd.DataFrame(self.cif_meta.aggregate(pipeline))
 

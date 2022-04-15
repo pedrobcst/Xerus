@@ -32,7 +32,6 @@ from Xerus.queriers.optimade import OptimadeQuery
 from Xerus.utils.cifutils import (get_provider, make_system, rename_multicif,
                                   standarize)
 
-dbhandler = LocalDB()
 abs_path = Path(__file__).parent
 proj_path = os.sep.join(str(abs_path).split(os.sep)[1:-1])
 dump_folders = ["mp_dump/", "cod_dump/", "aflow_dump/", "oqmd_dump/"]
@@ -81,7 +80,7 @@ def load_json(path: os.PathLike) -> dict:
         return json.load(fp)
 
 
-def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False) -> None:
+def multiquery(element_list: List[str], max_num_elem: int, name: str, resync:bool = False) -> None:
     """
     Query multiple providers for a given element list and maximum number of elements
 
@@ -98,15 +97,18 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     -------
     None
     """
+    dbhandler = LocalDB()
     query_type = make_system(standarize(element_list))
     td=[]
     if dbhandler.check_system(query_type) and not resync:
-        return "Asked to query {}, but already present in database".format(query_type)
+        return f"Asked to query {query_type}, but already present in database"
 
-    cod_path = str(os.path.join(abs_path, "cod_dump")) + os.sep
-    mp_path = os.path.join(abs_path, "mp_dump")
-    aflow_path = os.path.join(abs_path, "aflow_dump")
-    oqmd_path = os.path.join(abs_path, "oqmd_dump")
+
+        
+    cod_path = str(os.path.join(abs_path, f"{name}_{query_type}_COD")) + os.sep
+    mp_path = os.path.join(abs_path, f"{name}_{query_type}_MP")
+    # aflow_path = os.path.join(abs_path, "aflow_dump")
+    oqmd_path = os.path.join(abs_path, f"{name}_{query_type}_OQMD")
     ## MP query
     querymp(inc_eles=element_list,
              max_num_elem=max_num_elem,
@@ -121,32 +123,6 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     td.append(cod_path)
     cod.query_one(element_list=element_list, rename=True)
 
-    # AFLOW query
-    # AFLOWQuery(element_list, outfolder=aflow_path).query()
-    # td.append(aflow_path)
-
-    # # OQMD Query
-    # print("Querying OQMD...")
-    # oqmd = OQMDQuery(element_list=element_list, dumpfolder=oqmd_path)
-    # oqmd.query()
-    # td.append(oqmd_path)
-    
-
-    # TODO: Evaluate on how to implement each querier through optimade via the generic OptimadeQuery interface
-    # # Some example OPTIMADE queries
-    # print("Querying some OPTIMADE APIs")
-    # cod_optimade = OptimadeQuery(
-    #     base_url="https://www.crystallography.net/tcod/optimade/v1/",
-    #     elements=element_list,
-    #     folder_path=Path("optimade")
-    # )
-
-    # Currently only MP works.
-    # mp_optimade = OptimadeQuery(
-    #     base_url="https://optimade.materialsproject.org/v1/",
-    #     elements=element_list,
-    #     folder_path=Path("optimade")
-    # )
     print(f"Querying OQMD through OPTIMADE....")
     oqmd_optimade = OptimadeQuery(
         base_url="https://oqmd.org/optimade/v1",
@@ -157,9 +133,8 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     oqmd_optimade.query()
     td.append(oqmd_path)
 
-    # td.append(Path("optimade"))
-
-    movecifs(dump_folders=td)
+    test_folder = os.path.join(abs_path,f"{name}_{query_type}_cifs")
+    movecifs(dump_folders=td, test_folder=test_folder)
     print("Finished downloading CIFs.")
 
     if resync:
@@ -178,13 +153,13 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
     ## TEST CIFS ##
     print("Testing, uploading and deleting cifs...")
     #cmd = 'python ' +os.sep + str(os.path.join(proj_path,'test_cif.py'))
-    cmd = "python " + str(os.path.join(abs_path, "tcif.py"))
+    cmd = f"python {os.path.join(abs_path, 'tcif.py')} {test_folder}" 
     print(cmd)
     os.system(cmd)
 
     # ## UPDATE DB ##
     print("Uploading database with cifs..")
-    data = load_json(os.path.join(abs_path,'queried_cifs','cif.json'))
+    data = load_json(os.path.join(test_folder, 'cif.json'))
     print(len(data))
     if len(data) == 0:
         if resync:
@@ -208,5 +183,7 @@ def multiquery(element_list: List[str], max_num_elem: int,  resync:bool = False)
 
     ## Remove rest ##
     print("Deleting..")
-    shutil.rmtree(os.path.join(abs_path,'queried_cifs'))
+    shutil.rmtree(test_folder)
+    # Kill connection? We should really add a direct way to do this instead of deleting. This is a placeholder.
+    del(dbhandler)
 
