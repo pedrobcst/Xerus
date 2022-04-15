@@ -42,22 +42,15 @@ import os
 import sys
 from pathlib import Path
 
-from Xerus.engine.gsas2riet import run_gsas, simulate_pattern
+from tqdm import tqdm
+from Xerus.engine.gsas2riet import run_gsas
 from Xerus.settings.settings import INSTR_PARAMS, TEST_XRD
+from Xerus.utils.cifutils import get_ciflist
 
 instr_params = INSTR_PARAMS
 powder_data = TEST_XRD
 abs_path = Path(__file__).parent
-cif_folder = os.path.join(abs_path, "queried_cifs")
-cif_name = "cif.json"
-datapath = os.path.join(cif_folder,cif_name)
-from tqdm import tqdm
-from Xerus.utils.cifutils import get_ciflist
-
-if not os.path.exists(datapath):
-    get_ciflist(str(cif_folder) + os.sep, "r", True)
-with open(datapath, "r") as fp:
-    data = json.load(fp)
+# cif_folder = os.path.join(abs_path, "queried_cifs")
 
 def load_json(path):
     with open(path, "r") as fp:
@@ -66,7 +59,7 @@ def load_json(path):
 def check_extension(file, allowed=(".json", ".cif", ".ipynb_checkpoints")):
     return any([file.endswith(extension) for extension in allowed])
 
-def save_json(dict, filename=cif_name, folder=cif_folder):
+def save_json(dict, filename, folder):
     """
 
     :param dict:
@@ -78,6 +71,16 @@ def save_json(dict, filename=cif_name, folder=cif_folder):
         json.dump(dict, fp)
 
 if __name__ == "__main__":
+    # Get cif folder from command line
+    cif_folder = sys.argv[1]
+    cif_name = "cif.json"
+    datapath = os.path.join(cif_folder,cif_name)
+
+    if not os.path.exists(datapath):
+        get_ciflist(str(cif_folder) + os.sep, "r", True)
+    with open(datapath, "r") as fp:
+        data = json.load(fp)
+
 
     for i, entry in tqdm(enumerate(data)):
         filename = entry['filename']
@@ -120,7 +123,7 @@ if __name__ == "__main__":
     #             data[i]['gsas_status']['status'] = 1
     #             data[i]['gsas_status']['tested'] = True
     #             data[i]['ran'] = True
-    save_json(data)
+    save_json(data, "cif.json", cif_folder)
     ## clean up .lst, .gpx, .bak
     files = os.listdir(cif_folder)
     for file in files:

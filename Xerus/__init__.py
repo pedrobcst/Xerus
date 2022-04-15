@@ -21,10 +21,8 @@
 from __future__ import annotations
 
 import os
-import sys
 from multiprocessing import Pool
-from pathlib import Path
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Union
 
 import numpy as np
 import pandas as pd
@@ -42,10 +40,10 @@ from Xerus.similarity.pattern_removal import (combine_pos,
                                               run_correlation_analysis,
                                               run_correlation_analysis_riet)
 from Xerus.similarity.visualization import make_plot_all, make_plot_step
-from Xerus.utils.cifutils import make_system, make_system_types
+from Xerus.utils.cifutils import make_system
 from Xerus.utils.preprocessing import remove_baseline, standarize_intensity
-from Xerus.utils.tools import (blockPrinting, create_folder, group_data,
-                               load_json, make_offset, normalize_formula)
+from Xerus.utils.tools import (create_folder, group_data, load_json,
+                               make_offset, normalize_formula)
 from Xerus.utils.tools import plotly_add as to_add
 from Xerus.utils.tools import save_json
 
@@ -227,6 +225,7 @@ class XRay:
             outfolder=self.working_folder,
             maxn=self.maxsys,
             max_oxy=self.max_oxy,
+            name = self.name
         )
         self.cif_info = cif_meta
         if ignore_provider is not None:
