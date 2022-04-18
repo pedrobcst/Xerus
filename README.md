@@ -48,9 +48,8 @@ In this section we will briefly introduce how to install _Xerus_ in the easiest 
 #### System OS
 * _Xerus_ only supports Linux based and macOS systems.
 _Xerus_ was mostly developed in __Ubuntu 20.04__ and have been also tested in __CentOS 7.x__ and __MacOS systems (Intel)__ (M1 machines not available for testing.)
-```diff
-- We have not tested in Windows OS yet.
-```
+
+> NOTE: As of version 1.1b we started PARTIALLY supporting Windows (currently under testing). All features related to PHASE MATCHING and SEARCHING seems to be working (Win10 python 3.8). However, refinement optimization seems to not work at Windows yet. There is no ETA to support this. We recommend still using UNIX based systems (Linux/macOS).
 
 #### Materials Project APIKey
 Xerus relies on the Materials Project API for downloading crystal structures with requested chemical space.
