@@ -121,7 +121,16 @@ If all tests sucessfuly pass, _Xerus_ should be ready for use.
 
 > :warning: Make sure that before running the examples, you have started the MongoDB server.
 
-> Note: We are developing an ease of use Streamlit interface in [Xerus-streamlit](https://www.github.com/pedrobcst/Xerus-streamlit) repository. Contriubtions are welcome.
+## Streamlit Interface (BETA)
+
+As of release 1.1b we are providing a beta Streamlit interface that can help you interactively use XERUS (and its features). Altough not as flexible as using through Jupyter, it can provide a zero code alternative (or even be hosted in a main server where other users can directly use from their browser)
+
+To start it, after installation do:
+```python
+streamlit run app/app.py
+```
+
+
 
 # Citing
 If you use _Xerus_ please __also__ cite the following papers:
