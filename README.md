@@ -62,7 +62,7 @@ _Xerus_ relies on a MongoDB server for caching crystal structures downloaded fro
 To install the community version (Free) and run please follow the steps listed in:
  * [Ubuntu Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
  * [MacOS Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
- WIN: test...
+ HOOOOOOLA
 
 ## _Xerus_
 ### Package Installation
