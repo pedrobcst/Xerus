@@ -15,11 +15,11 @@ For the Xerus version that was published in the paper, please refer to release 1
 Introduction
 ============
 Welcome to the _Xerus_ project. Xerus is an open-source python wrapper / plugin around the GSASII Scriptable package,
-for automazation of phase quantification and Rietveld analysis by combinining similarity calculation of simulated patterns
-(Pearson`s) with quick Rietveld refinements.
+for automatization of phase quantification and Rietveld analysis by combining similarity calculations of simulated patterns
+(Pearson´s) with quick Rietveld refinements.
 
-_Xerus_ is only possible due to the existence of the following projects
-* COD (Crystollographic Open Database)
+_Xerus_ is only possible due to the existence of the following projects:
+* COD (Crystallographic Open Database)
 * The Materials Project (MP)
 * AFLOW Database
 * OQMD (Open Quantum Materials Database)  
@@ -49,7 +49,7 @@ In this section we will briefly introduce how to install _Xerus_ in the easiest 
 * _Xerus_ only supports Linux based and macOS systems.
 _Xerus_ was mostly developed in __Ubuntu 20.04__ and have been also tested in __CentOS 7.x__ and __MacOS systems (Intel)__ (M1 machines not available for testing.)
 
-> NOTE: As of version 1.1b we started PARTIALLY supporting Windows (currently under testing). All features related to PHASE MATCHING and SEARCHING seems to be working (Win10 python 3.8). However, refinement optimization seems to not work at Windows yet. There is no ETA to support this. We recommend still using UNIX based systems (Linux/macOS).
+> NOTE: As of version 1.1b we started PARTIALLY supporting Windows (currently under testing). All features related to PHASE MATCHING and SEARCHING seem to be working (Win10 python 3.8, Win11 python 3.8). However, refinement optimization seems to not work in Windows yet. There is no ETA to support this. We recommend still using UNIX based systems (Linux/macOS).
 
 #### Materials Project APIKey
 Xerus relies on the Materials Project API for downloading crystal structures with requested chemical space.
@@ -57,12 +57,12 @@ Therefore, please register and obtain an suitable API key (Free) at: \
 www.materialsproject.org \
 After registering, you can check your API Key by clicking the API tab at the upper right side of the website.
 
-##### MongoDB
+#### MongoDB
 _Xerus_ relies on a MongoDB server for caching crystal structures downloaded from the providing databases (COD, AFLOW and MP) \
 To install the community version (Free) and run please follow the steps listed in:
  * [Ubuntu Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
  * [MacOS Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
- HOOOOOOLA hello
+ * [Windows Installation Steps](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-windows/)
 
 ## _Xerus_
 ### Package Installation
@@ -77,6 +77,8 @@ cd Xerus
 pip install -e .
 ```
 > :warning: You might have trouble installing pymatgen if gcc is not present in your system. You can them for example do sudo apt install g++ to install in Ubuntu, then run pip install -r requirements.txt again. 
+
+>If you need to install the C+ tools for Windows, please follow this link: [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 
 
 
 ### Configuration
@@ -115,7 +117,8 @@ pytest -vvv
 ```
 If all tests sucessfuly pass, _Xerus_ should be ready for use.
 
-> :warning: This process might take a while. 
+> :warning: This process might take a while.
+ 
 # Usage
 
 - To learn how to use Xerus, please follow the Notebook, located at Examples/Examples.ipynb
