@@ -62,6 +62,7 @@ _Xerus_ relies on a MongoDB server for caching crystal structures downloaded fro
 To install the community version (Free) and run please follow the steps listed in:
  * [Ubuntu Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/)
  * [MacOS Installation Steps](https://docs.mongodb.com/manual/tutorial/install-mongodb-on-os-x/)
+ * [Windows Installation Steps](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-windows/)
 
 ## _Xerus_
 ### Package Installation
@@ -75,8 +76,21 @@ git clone http://www.github.com/pedrobcst/Xerus/
 cd Xerus
 pip install -e .
 ```
-> :warning: You might have trouble installing pymatgen if gcc is not present in your system. You can them for example do sudo apt install g++ to install in Ubuntu, then run pip install -r requirements.txt again. 
+> :warning: You might have trouble installing pymatgen if gcc is not present in your system. You can them for example do sudo apt install g++ to install in Ubuntu, then run pip install -e . again. 
 
+#### Windows Installation (Beta)
+
+1. Install Microsoft C++ Build Tools
+2. Install Anaconda
+3. Clone or Download this repository.
+4. Open anaconda shell (not windows cmd, but anaconda shell) and cd into the downloaded folder of Xerus.
+5. Do the following commands:
+```bash
+conda create -n Xerus python==3.8 anaconda
+conda activate Xerus
+pip install -e .
+```
+6. Proceed to set the settings as describe below.
 
 ### Configuration
 
