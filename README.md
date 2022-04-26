@@ -81,7 +81,7 @@ pip install -e .
 
 #### Windows Installation (Beta)
 
-1. Install Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 
+1. Install [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 
 2. Install Anaconda
 3. Clone or Download this repository.
 4. Open anaconda shell (not windows cmd, but anaconda shell) and cd into the downloaded folder of Xerus.
