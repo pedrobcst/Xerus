@@ -5,6 +5,7 @@ from typing import List, Union
 import pandas as pd
 import streamlit as st
 from st_aggrid import AgGrid
+from Xerus.utils.cifutils import make_system_types
 
 from conf import AppSettings
 from xerus_plot import plot_highest_correlated, plot_read_data
@@ -65,7 +66,8 @@ if file:
                     poly_degree = st.number_input("Polynomial degree", min_value=2, max_value=12, step=1, value=8,key="poly_degree")    
                 elements = st.text_input("Elements seperated by comma", value="Ho", key="element_list").split(",")
                 elements = [element.strip() for element in elements if len(element) > 0]
-                max_oxygen = st.number_input("Max oxygen", min_value=0, max_value=10, step=1, value=2, key="max_oxy")
+                max_oxygen = st.number_input("Max oxygen", min_value=0, max_value=10, step=1, value=2, key="max_oxy", help="Define how much oxygen is allowed in the combinations. For example if max_oxy=2, and there are 3 elements (Ho,B,O), he will allow search up to Ho-O")
+                is_ceramic = st.checkbox("Ceramic Material", key="is_ceramic", help = "If the material is a ceramic (oxide), the ignore_combs parameter later will be set to accept only oxide combinations.")
                 st.write("Current element list is:", elements)
             # Data plot
             with c2:
@@ -88,15 +90,21 @@ if file:
             ignore_ids = process_input(st.text_input("Ignore IDs", value="", key="ignore_ids"))
             ignore_providers = process_input(st.text_input("Ignore providers", value="AFLOW", key="ignore_providers"))
             ignore_comb = process_input(st.text_input("Ignore combinations", value="", key="ignore_comb"))
+        if is_ceramic:
+            to_ignore = make_system_types([ele for ele in elements if ele != "O"])
+            if ignore_comb:
+                ignore_comb.extend(to_ignore)
+            else:
+                ignore_comb = to_ignore
     
     # Filter Settings
     with st.expander("Current Filter Settings", expanded=False):
         c1, c2, c3 = st.columns(3)
         c1.markdown("**Ignore IDs**")
         c1.write(ignore_ids)
-        c2.markdown("**Ignore providers**")
+        c2.markdown("**Ignore combinations**")
         c2.write(ignore_comb)
-        c3.markdown("**Ignore combinations**")
+        c3.markdown("**Ignore providers**")
         c3.write(ignore_providers)
     if st.button("Run analysis", key="run_analysis"):
         args_xerus = dict(name=name, working_folder=working_folder, exp_data_file=path, elements=elements,
