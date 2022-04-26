@@ -78,10 +78,10 @@ pip install -e .
 ```
 > :warning: You might have trouble installing pymatgen if gcc is not present in your system. You can them for example do sudo apt install g++ to install in Ubuntu, then run pip install -e . again. 
 
-<<<<<<< HEAD
+
 #### Windows Installation (Beta)
 
-1. Install Microsoft C++ Build Tools
+1. Install Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 
 2. Install Anaconda
 3. Clone or Download this repository.
 4. Open anaconda shell (not windows cmd, but anaconda shell) and cd into the downloaded folder of Xerus.
@@ -93,9 +93,7 @@ pip install -e .
 ```
 6. Proceed to set the settings as describe below.
 =======
->If you need to install the C+ tools for Windows, please follow this link: [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) 
 
->>>>>>> windows_readme_update
 
 ### Configuration
 
