@@ -103,7 +103,7 @@ def make_plot_step(runs_info: List[Tuple[pd.DataFrame, list, float, Any, Any]], 
                 for pattern in list_of_patterns:
                     pattern.loc[removed, 'int'] = None
         except KeyError:
-            pass
+            return "Failed to plot the step data.."
 
     exp_datan = raw_data.copy()
     exp_datan.int = exp_datan.int / exp_datan.int.max()
