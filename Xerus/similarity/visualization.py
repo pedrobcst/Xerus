@@ -18,15 +18,15 @@
 # LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import seaborn as sns
-import plotly.express as px
-from plotly.graph_objects import Figure
 import os
-import pandas as pd
-import numpy as np
-from typing import List, Tuple, Any
-from Xerus.utils.tools import plotly_add as to_add
+from typing import Any, List, Tuple
 
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import seaborn as sns
+from plotly.graph_objects import Figure
+from Xerus.utils.tools import plotly_add as to_add
 
 
 def make_plot_step(runs_info: List[Tuple[pd.DataFrame, list, float, Any, Any]], topn: List[pd.DataFrame],
@@ -92,15 +92,18 @@ def make_plot_step(runs_info: List[Tuple[pd.DataFrame, list, float, Any, Any]], 
         acc_patterns.append(patterns)
 
     if solver == "box":
-        for n, (removed, tup) in enumerate(zip(rem_indexes, runs_info)):
-            print(len(removed))
-            exp2_data = raw_data.copy()
-            exp2_data.int = exp2_data.int / exp2_data.int.max()
-            exp2_data.loc[removed, 'int'] = None
-            final_exp.append(exp2_data)
-            list_of_patterns = acc_patterns[n]
-            for pattern in list_of_patterns:
-                pattern.loc[removed, 'int'] = None
+        try:
+            for n, (removed, tup) in enumerate(zip(rem_indexes, runs_info)):
+                print(len(removed))
+                exp2_data = raw_data.copy()
+                exp2_data.int = exp2_data.int / exp2_data.int.max()
+                exp2_data.loc[removed, 'int'] = None
+                final_exp.append(exp2_data)
+                list_of_patterns = acc_patterns[n]
+                for pattern in list_of_patterns:
+                    pattern.loc[removed, 'int'] = None
+        except KeyError:
+            pass
 
     exp_datan = raw_data.copy()
     exp_datan.int = exp_datan.int / exp_datan.int.max()
