@@ -23,9 +23,11 @@ import urllib.parse
 from configparser import ConfigParser
 from pathlib import Path
 
+
+
 abs_path = Path(__file__).parent
 project_path = str(Path(os.path.dirname(os.path.realpath(__file__))).parent) + os.sep
-
+__version__ = '1.1b'
 
 config = ConfigParser()
 config.read(abs_path.joinpath("config.conf"))
@@ -38,6 +40,8 @@ TEST_XRD = os.path.join(project_path,config['gsas2']['testxrd'])
 MP_API_KEY = config['mp']['apikey']
 
 REQUESTS_TIMEOUT = 60.0
+REQUESTS_HEADER =  {"User-Agent": f"Xerus/{__version__}"}
+
 
 if config['mongodb']['host'] == 'localhost':
     DB_CONN = 'localhost'

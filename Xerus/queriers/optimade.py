@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import List, Union
 
 import requests
-from Xerus.settings.settings import REQUESTS_TIMEOUT
+from Xerus.settings.settings import REQUESTS_TIMEOUT, REQUESTS_HEADER
 
 from optimade.adapters import Structure
 
@@ -42,7 +42,7 @@ class OptimadeQuery:
         else:
             self.extra_filter = None
         # Headers to pass through requuests
-        self.headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"}
+        self.headers = REQUESTS_HEADER
 
         self.elements = elements
         self.base_url = base_url

@@ -27,7 +27,7 @@ from typing import List, Tuple
 import requests
 
 from Xerus.utils.cifutils import rename_multicif
-from Xerus.settings.settings import REQUESTS_TIMEOUT
+from Xerus.settings.settings import REQUESTS_TIMEOUT, REQUESTS_HEADER
 
 
 def make_name(url: str):
@@ -94,7 +94,7 @@ class CODQuery(object):
             if cif_data.status_code == 200:
                 cif_urls = cif_data.text.split("\n")[:-1]
                 for url in cif_urls:
-                    cif = requests.get(url, timeout=REQUESTS_TIMEOUT)
+                    cif = requests.get(url, headers=REQUESTS_HEADER, timeout=REQUESTS_TIMEOUT)
                     if cif.status_code == 200:
                         name = make_name(url)
                         with open(os.path.join(self.folder_path, name), "wb") as f:
