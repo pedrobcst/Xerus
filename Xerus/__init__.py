@@ -20,6 +20,8 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 
+__version__ = '1.1b'
+
 import os
 from multiprocessing import Pool
 from typing import Any, List, Union
