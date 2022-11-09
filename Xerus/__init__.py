@@ -29,7 +29,7 @@ from typing import Any, List, Union
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from pymatgen import Composition
+from pymatgen.core import Composition
 
 from Xerus.db.localdb import LocalDB
 from Xerus.engine.gsas2riet import refine_comb, simulate_spectra

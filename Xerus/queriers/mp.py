@@ -21,6 +21,7 @@
 import os
 import sys
 from pathlib import Path
+from mp_api.client import MPRester
 import pymatgen
 from pymatgen.io.cif import CifWriter
 from Xerus.utils.cifutils import make_combinations
@@ -76,7 +77,7 @@ def querymp(inc_eles: List[str], exc_eles: List = [], max_num_elem:int = 3, api_
     -------
     Returns a DataFrame with the queried data information with data is available for elements combination.
     '''
-    a = pymatgen.MPRester(api_key)
+    a = MPRester(api_key)
     if not combination:
         qp = {"elements": {"$all": inc_eles, "$nin": exc_eles}, "nelements": {"$lte": max_num_elem}}
         data = a.query(qp, ['pretty_formula', 'structure', 'theoretical', 'material_id', 'e_above_hull'])

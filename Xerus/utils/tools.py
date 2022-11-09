@@ -20,7 +20,7 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 from pathlib import Path
 import os, sys
-from pymatgen import Composition
+from pymatgen.core import Composition
 from typing import List, Tuple
 import json
 import re

@@ -4,6 +4,7 @@ import unittest.mock
 import mongomock
 import monty.serialization
 import pymatgen
+# from mp_api.client import MPRester
 import pytest
 from Xerus import XRay
 
@@ -22,7 +23,7 @@ def working_folder(request):
 @pytest.fixture(scope="function")
 def mock_mp_rester():
     """A mock fixture for querying the Ho-B chemical system from the MP API."""
-    with unittest.mock.patch("pymatgen.MPRester") as mock:
+    with unittest.mock.patch("mp_api.client.MPRester") as mock:
         instance = mock.return_value
         instance.query.side_effect = [
             monty.serialization.loadfn(INSTALL_PATH / "data/Ho-test.json"),
