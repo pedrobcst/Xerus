@@ -148,3 +148,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+#API_KEY
+# Xerus/settings/config.conf
