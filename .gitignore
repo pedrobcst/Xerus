@@ -148,5 +148,5 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-#API_KEY
-# Xerus/settings/config.conf
+#Avoid upload YOUR_API_KEY
+# git update-index --assume-unchanged Xerus/settings/config.conf
