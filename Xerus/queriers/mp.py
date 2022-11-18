@@ -57,14 +57,13 @@ def make_cifs(data: pd.DataFrame, symprec: float = 1e-2, folder_path: os.PathLik
             print("Writing {}".format(filename))
 
 
-def querymp(inc_eles: List[str], exc_eles: List = [], max_num_elem:int = 3, api_key: str = api_key,
-            combination: bool = True, min_hull: float = 1e-4, write: bool =True,
+def querymp(inc_eles: List[str], max_num_elem:int = 3, min_hull: float = 1e-4, write: bool =True,
             folder_path: os.PathLike = dump_folder) -> pd.DataFrame:
     '''
 
     Parameters
     ----------
-    inc_eles : Elements to query (inclusive)
+    inc_eles : Elements to query (inclusive) eg:["Ho", "B"]
     exc_eles : Elements NOT to query (exclusive)
     max_num_elem : Maximum number of elements
     api_key : API-Key
@@ -77,34 +76,22 @@ def querymp(inc_eles: List[str], exc_eles: List = [], max_num_elem:int = 3, api_
     -------
     Returns a DataFrame with the queried data information with data is available for elements combination.
     '''
-    a = MPRester(api_key)
-    if not combination:
-        qp = {"elements": {"$all": inc_eles, "$nin": exc_eles}, "nelements": {"$lte": max_num_elem}}
-        data = a.query(qp, ['pretty_formula', 'structure', 'theoretical', 'material_id', 'e_above_hull'])
-        if len(data) > 0:
-            data = pd.DataFrame.from_dict(data)
-            data = data[~data.theoretical]
-            data = data[data.e_above_hull <= min_hull]
-            data.reset_index(drop=True, inplace=True)
-    else:
-        dfs = []
-        combations_flat = make_combinations(inc_eles, max_num_elem)
-        for comb in combations_flat:
-            print('Getting data for the following atoms combinations: {}'.format('-'.join(comb)))
-            qp = {"elements": {"$all": comb, "$nin": exc_eles}, "nelements": {"$lte": len(comb)}}
-            data = a.query(qp, ['pretty_formula', 'structure', 'theoretical', 'material_id', 'e_above_hull'])
-            if len(data) > 0:
-                data = pd.DataFrame.from_dict(data)
-                data = data[~data.theoretical]
-                data.reset_index(drop=True, inplace=True)
-                dfs.append(data)
-        final = pd.concat(dfs)
-        final = final[final.e_above_hull <= min_hull]
-        final.reset_index(drop=True, inplace=True)
-        return final
+    api_key: str = MP_API_KEY
+    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical']
+    cifs = ['pretty_formula', 'material_id', 'structure', 'e_above_hull', 'theoretical']
 
-    if len(data) == 0:
+    with MPRester(api_key) as mpr:    
+        datas = mpr.summary.search( chemsys=inc_eles,
+                                    fields = properties, 
+                                    theoretical = False, 
+                                    energy_above_hull = ( 0, min_hull))
+        datadf = [data.dict() for data in datas]
+        datadf = pd.DataFrame(datadf)
+        datadf = datadf.drop(columns = ['fields_not_requested'])
+        datadf = datadf.set_axis(cifs, axis='columns')
+        
+    if len(datadf) == 0:
         return 'No data.'
     if write:
-        make_cifs(data, folder_path=folder_path)
-    return data
+        make_cifs(datadf, folder_path=folder_path)
+    return datadf
