@@ -48,7 +48,7 @@ def make_cifs(data: pd.DataFrame, symprec: float = 1e-2, folder_path: os.PathLik
     """
     if not os.path.isdir(folder_path):
         os.mkdir(folder_path)
-    for mid, name, struc in zip(data['material_id'], data['pretty_formula'], data.structure):
+    for mid, name, struc in zip(data['material_id'], data['formula_pretty'], data.structure):
         writer = CifWriter(struc, symprec=symprec)
         filename = folder_path + os.sep + name + "_" + "MP_" + mid + ".cif"
 
@@ -77,21 +77,19 @@ def querymp(inc_eles: List[str], max_num_elem:int = 3, min_hull: float = 1e-4, w
     Returns a DataFrame with the queried data information with data is available for elements combination.
     '''
     api_key: str = MP_API_KEY
-    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical']
-    cifs = ['pretty_formula', 'material_id', 'structure', 'e_above_hull', 'theoretical']
+    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical', 'fields_not_requested']
 
     with MPRester(api_key) as mpr:    
         datas = mpr.summary.search( chemsys=inc_eles,
                                     fields = properties, 
                                     theoretical = False, 
                                     energy_above_hull = ( 0, min_hull))
+        if len(datas) == 0:
+            return 'No data.'
         datadf = [data.dict() for data in datas]
         datadf = pd.DataFrame(datadf)
-        datadf = datadf.drop(columns = ['fields_not_requested'])
-        datadf = datadf.set_axis(cifs, axis='columns')
+        datadf = datadf.set_axis(properties, axis='columns')
         
-    if len(datadf) == 0:
-        return 'No data.'
     if write:
         make_cifs(datadf, folder_path=folder_path)
     return datadf
