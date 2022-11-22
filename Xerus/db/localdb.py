@@ -335,7 +335,7 @@ class LocalDB:
         """
         from Xerus.queriers.multiquery import multiquery
         element_list = system_type.split("-")
-        multiquery(element_list , resync=True)
+        multiquery(element_list , name="resync",resync=True)
 
     def resync_all(self):
         """

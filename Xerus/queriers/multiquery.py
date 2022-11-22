@@ -108,7 +108,7 @@ def multiquery(element_list: List[str], name: str, resync:bool = False) -> None:
     # aflow_path = os.path.join(abs_path, "aflow_dump")
     ## MP query
     mp_path = os.path.join(abs_path, f"{name}_{query_type}_MP")
-    querymp(inc_eles=element_list,
+    querymp(inc_eles=query_type,
             max_num_elem=max_num_elem,
             min_hull=0.1, 
             folder_path=mp_path) # Moving hull to 0.1
