@@ -118,6 +118,7 @@ def multiquery(element_list: List[str], name: str, resync:bool = False) -> None:
     cod_path = str(os.path.join(abs_path, f"{name}_{query_type}_COD")) + os.sep
     cod = CODQuery(elements=element_list,
                    max_num_elements=max_num_elem,
+                   combination=False,
                    folder_path=cod_path + os.sep)
     td.append(cod_path)
     cod.query_one(element_list=element_list, rename=True)
