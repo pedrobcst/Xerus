@@ -7,8 +7,6 @@ sys.path.append(GSAS2_BIN)
 import GSASIIscriptable as G2sc
 from Xerus.db.localdb import LocalDB
 from Xerus.settings.settings import MP_API_KEY
-# from pymatgen.ext.matproj import MPRestError
-# from pymatgen.ext.matproj import MPRester
 from mp_api.client import MPRestError
 from mp_api.client import MPRester
 MP_API_KEY_WRONG = "bQEFQ!"
