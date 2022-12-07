@@ -82,6 +82,7 @@ def querymp(inc_eles: List[str], max_num_elem:int = 3, min_hull: float = 1e-4, w
                                 fields = properties, 
                                 theoretical = False, 
                                 energy_above_hull = ( 0, min_hull))
+    # In order to pass pytest, the test data format is different from the online data format.
     if "pytest" in sys.modules:
         datadf = datas
     else:
