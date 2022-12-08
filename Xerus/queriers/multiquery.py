@@ -80,7 +80,7 @@ def load_json(path: os.PathLike) -> dict:
         return json.load(fp)
 
 
-def multiquery(element_list: List[str], max_num_elem: int, name: str, resync:bool = False) -> None:
+def multiquery(element_list: List[str], name: str, resync:bool = False) -> None:
     """
     Query multiple providers for a given element list and maximum number of elements
 
@@ -97,25 +97,25 @@ def multiquery(element_list: List[str], max_num_elem: int, name: str, resync:boo
     -------
     None
     """
+    max_num_elem = len(element_list)
+
     dbhandler = LocalDB()
     query_type = make_system(standarize(element_list))
     td=[]
     if dbhandler.check_system(query_type) and not resync:
         return f"Asked to query {query_type}, but already present in database"
 
-
-        
-    cod_path = str(os.path.join(abs_path, f"{name}_{query_type}_COD")) + os.sep
-    mp_path = os.path.join(abs_path, f"{name}_{query_type}_MP")
     # aflow_path = os.path.join(abs_path, "aflow_dump")
-    oqmd_path = os.path.join(abs_path, f"{name}_{query_type}_OQMD")
     ## MP query
-    querymp(inc_eles=element_list,
-             max_num_elem=max_num_elem,
-             combination=False, min_hull=0.1, folder_path=mp_path) # Moving hull to 0.1
+    mp_path = os.path.join(abs_path, f"{name}_{query_type}_MP")
+    querymp(inc_eles=query_type,
+            max_num_elem=max_num_elem,
+            min_hull=0.1, 
+            folder_path=mp_path) # Moving hull to 0.1
     td.append(mp_path)
 
     ## COD query
+    cod_path = str(os.path.join(abs_path, f"{name}_{query_type}_COD")) + os.sep
     cod = CODQuery(elements=element_list,
                    max_num_elements=max_num_elem,
                    combination=False,
@@ -123,6 +123,8 @@ def multiquery(element_list: List[str], max_num_elem: int, name: str, resync:boo
     td.append(cod_path)
     cod.query_one(element_list=element_list, rename=True)
 
+    ## oqmd query
+    oqmd_path = os.path.join(abs_path, f"{name}_{query_type}_OQMD")
     print(f"Querying OQMD through OPTIMADE....")
     oqmd_optimade = OptimadeQuery(
         base_url="https://oqmd.org/optimade/v1",

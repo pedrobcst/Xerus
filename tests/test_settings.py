@@ -7,8 +7,8 @@ sys.path.append(GSAS2_BIN)
 import GSASIIscriptable as G2sc
 from Xerus.db.localdb import LocalDB
 from Xerus.settings.settings import MP_API_KEY
-from pymatgen.ext.matproj import MPRestError
-from pymatgen import MPRester
+from mp_api.client import MPRestError
+from mp_api.client import MPRester
 MP_API_KEY_WRONG = "bQEFQ!"
 import pytest
 
@@ -46,7 +46,8 @@ def test_mpconn():
     True if OK, False or Not
     """
     try:
-        MPRester(MP_API_KEY).get_data("HoB2")
+        # MPRester(MP_API_KEY).get_data("HoB2")
+        MPRester(MP_API_KEY).summary.search(formula = "HoB2", fields=["material_id", "band_gap"])
         assert True
     except MPRestError:
         assert False, "Failed to connect to MP Project"

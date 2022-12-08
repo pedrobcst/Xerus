@@ -173,7 +173,7 @@ class LocalDB:
         from Xerus.queriers.multiquery import multiquery
         if not self.check_system(system_type):
             elements = system_type.split("-")
-            multiquery(elements, max_num_elem=len(elements), name = name)
+            multiquery(elements, name = name)
         return self
 
     def check_all(self, system_types: Tuple[str], name: str) -> LocalDB:
@@ -335,8 +335,7 @@ class LocalDB:
         """
         from Xerus.queriers.multiquery import multiquery
         element_list = system_type.split("-")
-        amount = len(element_list)
-        multiquery(element_list, amount, resync=True)
+        multiquery(element_list , name="resync",resync=True)
 
     def resync_all(self):
         """

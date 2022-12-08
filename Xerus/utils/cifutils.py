@@ -28,7 +28,7 @@ from glob import glob
 from itertools import combinations
 import shutil
 from typing import List, Tuple, Dict
-from pymatgen import Composition
+from pymatgen.core import Composition
 from zipfile import ZipFile
 from typing import List
 import re

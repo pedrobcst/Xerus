@@ -148,3 +148,8 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+#Avoid upload YOUR_API_KEY
+# git update-index --assume-unchanged Xerus/settings/config.conf
+
+#test file
+/Examples/Xerustest.ipynb

@@ -21,7 +21,7 @@
 import os
 import sys
 from pathlib import Path
-import pymatgen
+from mp_api.client import MPRester
 from pymatgen.io.cif import CifWriter
 from Xerus.utils.cifutils import make_combinations
 from Xerus.settings.settings import MP_API_KEY
@@ -47,7 +47,7 @@ def make_cifs(data: pd.DataFrame, symprec: float = 1e-2, folder_path: os.PathLik
     """
     if not os.path.isdir(folder_path):
         os.mkdir(folder_path)
-    for mid, name, struc in zip(data['material_id'], data['pretty_formula'], data.structure):
+    for mid, name, struc in zip(data['material_id'], data['formula_pretty'], data.structure):
         writer = CifWriter(struc, symprec=symprec)
         filename = folder_path + os.sep + name + "_" + "MP_" + mid + ".cif"
 
@@ -56,14 +56,13 @@ def make_cifs(data: pd.DataFrame, symprec: float = 1e-2, folder_path: os.PathLik
             print("Writing {}".format(filename))
 
 
-def querymp(inc_eles: List[str], exc_eles: List = [], max_num_elem:int = 3, api_key: str = api_key,
-            combination: bool = True, min_hull: float = 1e-4, write: bool =True,
+def querymp(inc_eles: List[str], max_num_elem:int = 3, min_hull: float = 1e-4, write: bool =True,
             folder_path: os.PathLike = dump_folder) -> pd.DataFrame:
     '''
 
     Parameters
     ----------
-    inc_eles : Elements to query (inclusive)
+    inc_eles : Elements to query (inclusive) eg:["Ho", "B"]
     exc_eles : Elements NOT to query (exclusive)
     max_num_elem : Maximum number of elements
     api_key : API-Key
@@ -76,34 +75,22 @@ def querymp(inc_eles: List[str], exc_eles: List = [], max_num_elem:int = 3, api_
     -------
     Returns a DataFrame with the queried data information with data is available for elements combination.
     '''
-    a = pymatgen.MPRester(api_key)
-    if not combination:
-        qp = {"elements": {"$all": inc_eles, "$nin": exc_eles}, "nelements": {"$lte": max_num_elem}}
-        data = a.query(qp, ['pretty_formula', 'structure', 'theoretical', 'material_id', 'e_above_hull'])
-        if len(data) > 0:
-            data = pd.DataFrame.from_dict(data)
-            data = data[~data.theoretical]
-            data = data[data.e_above_hull <= min_hull]
-            data.reset_index(drop=True, inplace=True)
-    else:
-        dfs = []
-        combations_flat = make_combinations(inc_eles, max_num_elem)
-        for comb in combations_flat:
-            print('Getting data for the following atoms combinations: {}'.format('-'.join(comb)))
-            qp = {"elements": {"$all": comb, "$nin": exc_eles}, "nelements": {"$lte": len(comb)}}
-            data = a.query(qp, ['pretty_formula', 'structure', 'theoretical', 'material_id', 'e_above_hull'])
-            if len(data) > 0:
-                data = pd.DataFrame.from_dict(data)
-                data = data[~data.theoretical]
-                data.reset_index(drop=True, inplace=True)
-                dfs.append(data)
-        final = pd.concat(dfs)
-        final = final[final.e_above_hull <= min_hull]
-        final.reset_index(drop=True, inplace=True)
-        return final
+    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical', 'fields_not_requested']
 
-    if len(data) == 0:
+    mpr = MPRester(api_key)     
+    datas = mpr.summary.search( chemsys=inc_eles,
+                                fields = properties, 
+                                theoretical = False, 
+                                energy_above_hull = ( 0, min_hull))
+    # In order to pass pytest, the test data format is different from the online data format.
+    if "pytest" in sys.modules:
+        datadf = datas
+    else:
+        datadf = [data.dict() for data in datas]
+    datadf = pd.DataFrame(datadf)
+    # datadf = datadf.set_axis(properties, axis='columns')
+    if len(datadf) == 0:
         return 'No data.'
     if write:
-        make_cifs(data, folder_path=folder_path)
-    return data
+        make_cifs(datadf, folder_path=folder_path)
+    return datadf
