@@ -19,7 +19,7 @@ oqmd_option_2 = {
     "nsites": "<=4"
 }
 cod_option = {
-    "_cod_volume": "<10000"
+    "_cod_volume": "<10001"
 }
 COD_URL = "https://www.crystallography.net/cod/optimade/v1"
 OQMD_URL = "https://oqmd.org/optimade/v1"
