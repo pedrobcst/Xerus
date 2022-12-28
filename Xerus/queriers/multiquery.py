@@ -135,6 +135,17 @@ def multiquery(element_list: List[str], name: str, resync:bool = False) -> None:
     oqmd_optimade.query()
     td.append(oqmd_path)
 
+    odbx_misc_path = os.path.join(abs_path, f"{name}_{query_type}_odbx_misc")
+    print(f"Querying odbx through OPTIMADE")
+    odbx_misc_optimade = OptimadeQuery(
+        base_url="https://optimade-misc.odbx.science/v1",
+        elements=element_list,
+        folder_path=Path(odbx_misc_path),
+        extra_filters={"_odbx_hull_distance": "<0.05"}
+    )
+    odbx_misc_optimade.query()
+    td.append(odbx_misc_path)
+
     test_folder = os.path.join(abs_path,f"{name}_{query_type}_cifs")
     movecifs(dump_folders=td, test_folder=test_folder)
     print("Finished downloading CIFs.")
