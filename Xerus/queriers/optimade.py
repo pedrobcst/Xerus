@@ -11,6 +11,7 @@ import requests
 from Xerus.settings.settings import REQUESTS_TIMEOUT, REQUESTS_HEADER
 
 from optimade.adapters import Structure
+from pymatgen.core import Structure as PymatgenStructure
 
 
 class OptimadeQuery:
@@ -140,7 +141,7 @@ class OptimadeQuery:
                     # Get the suffix from provider and provider id
                     cif_suffix = self.make_suffix(entry=structure.entry.dict(), meta=meta)
                     # Convert the optimade structure into pymatgen format
-                    pymatgen_structure = structure.convert("pymatgen")
+                    pymatgen_structure = PymatgenStructure.from_str(structure.convert("cif"), fmt="cif")
                     # Get the reduced formula
                     formula = pymatgen_structure.composition.reduced_formula
                     # Make the cifname
