@@ -545,11 +545,11 @@ class XRay:
             auto = False
             
         if is_ceramic:
-          to_ignore = make_system_types([ele for ele in elements if ele != "O"])
-          if ignore_comb:
-            ignore_comb.extend(to_ignore)
-          else:
-            ignore_comb = to_ignore
+            to_ignore = make_system_types([ele for ele in elements if ele != "O"])
+            if ignore_comb:
+                ignore_comb.extend(to_ignore)
+            else:
+                ignore_comb = to_ignore
 
         # Get the cifs, simulate the patterns, run correlation (first phase)
         self.get_cifs(
