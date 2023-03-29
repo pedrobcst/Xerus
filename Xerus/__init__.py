@@ -486,6 +486,7 @@ class XRay:
         plot_all: bool = False,
         ignore_provider: List[str] = ("AFLOW",),
         ignore_comb: List[str] = None,
+        is_ceramic: bool = False,
         ignore_ids: List[str] = None,
         solver: str = "box",
         group_method: str = "system_type",
@@ -542,6 +543,13 @@ class XRay:
             n_runs = 100
         else:
             auto = False
+            
+        if is_ceramic:
+          to_ignore = make_system_types([ele for ele in elements if ele != "O"])
+          if ignore_comb:
+            ignore_comb.extend(to_ignore)
+          else:
+            ignore_comb = to_ignore
 
         # Get the cifs, simulate the patterns, run correlation (first phase)
         self.get_cifs(
