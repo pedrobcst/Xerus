@@ -507,6 +507,7 @@ class XRay:
         plot_all : To export all refinement plots (defaults to False)
         ignore_provider : A list of providers to ignore. Default: ["AFLOW"], due to the large amount of theoretical crystal structures. Can be manually turned on.
         ignore_comb : A list of combinations to ignore. Eg: ["B-O"], would ignore searching for B-O oxide.
+        is_ceramic : auto filling ignore_comb if it is ceramic material
         ignore_ids: A list of possible unique IDs to ignore. Defaults to None.
         solver: Decide which solver to use. Defaults to box method "box". For residual method use "rietveld"
         group_method: Decides how to try to group similiar crystal structures. Defaults to "system_type".
