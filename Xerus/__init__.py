@@ -486,6 +486,7 @@ class XRay:
         plot_all: bool = False,
         ignore_provider: List[str] = ("AFLOW",),
         ignore_comb: List[str] = None,
+        is_ceramic: bool = False,
         ignore_ids: List[str] = None,
         solver: str = "box",
         group_method: str = "system_type",
@@ -506,6 +507,7 @@ class XRay:
         plot_all : To export all refinement plots (defaults to False)
         ignore_provider : A list of providers to ignore. Default: ["AFLOW"], due to the large amount of theoretical crystal structures. Can be manually turned on.
         ignore_comb : A list of combinations to ignore. Eg: ["B-O"], would ignore searching for B-O oxide.
+        is_ceramic : make auto-filling of ignore_comb if it is ceramic material
         ignore_ids: A list of possible unique IDs to ignore. Defaults to None.
         solver: Decide which solver to use. Defaults to box method "box". For residual method use "rietveld"
         group_method: Decides how to try to group similiar crystal structures. Defaults to "system_type".
@@ -542,6 +544,13 @@ class XRay:
             n_runs = 100
         else:
             auto = False
+            
+        if is_ceramic:
+            to_ignore = make_system_types([ele for ele in elements if ele != "O"])
+            if ignore_comb:
+                ignore_comb.extend(to_ignore)
+            else:
+                ignore_comb = to_ignore
 
         # Get the cifs, simulate the patterns, run correlation (first phase)
         self.get_cifs(
