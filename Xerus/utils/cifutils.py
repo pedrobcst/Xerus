@@ -221,10 +221,10 @@ def make_system_types(elements: List[str], size: int = None, ceramic_mode: bool 
     """
     if size is None:
         size = len(elements)
-        if ceramic_mode:
-            return [make_system(standarize(comb)) for comb in make_combinations_oxide(elements, size)]
-        else:
-            return [make_system(standarize(comb)) for comb in make_combinations(elements, size)]
+    if ceramic_mode:
+        return [make_system(standarize(comb)) for comb in make_combinations_oxide(elements, size)]
+    else:
+        return [make_system(standarize(comb)) for comb in make_combinations(elements, size)]
 
 
 def make_system(comp: str) -> str:
