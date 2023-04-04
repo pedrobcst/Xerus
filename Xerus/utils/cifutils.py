@@ -110,7 +110,7 @@ def make_combinations_oxide(element_list: List[str], max_num_elem: int) -> List[
 
     Returns
     -------
-    A list of tuples of each combination. ie:
+    A list of each combination. ie:
     ['Fe','La','Sr','Ba','O'] ->[['O', 'Fe'], ['O', 'La'], ['O', 'Sr'], 
     ['O', 'Ba'], ['O', 'Fe', 'La'], ['O', 'La', 'Sr'], ['O', 'Sr', 'Ba'], 
     ['O', 'Fe', 'La', 'Sr'], ['O', 'La', 'Sr', 'Ba'], ['O', 'Fe', 'La', 'Sr', 'Ba']]
