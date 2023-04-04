@@ -204,7 +204,7 @@ def get_elements(name: str) -> List[str]:
     return Composition(name).chemical_system.split("-")
 
 
-def make_system_types(elements: List[str], size: int = None) -> List[str]:
+def make_system_types(elements: List[str], size: int = None, ceramic_mode: bool = False) -> List[str]:
     """
     Make "system-types" from a list of elements
 
@@ -221,7 +221,10 @@ def make_system_types(elements: List[str], size: int = None) -> List[str]:
     """
     if size is None:
         size = len(elements)
-    return [make_system(standarize(comb)) for comb in make_combinations(elements, size)]
+        if ceramic_mode:
+            return [make_system(standarize(comb)) for comb in make_combinations_oxide(elements, size)]
+        else:
+            return [make_system(standarize(comb)) for comb in make_combinations(elements, size)]
 
 
 def make_system(comp: str) -> str:
