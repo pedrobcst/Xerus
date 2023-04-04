@@ -97,6 +97,36 @@ def make_combinations(element_list: List[str], max_num_elem: int) -> List[Tuple[
     combinations_flat = [item for sublist in comb for item in sublist]
     return combinations_flat
 
+def get_combinations_oxide(iterable, length):
+    return [iterable[i:i+length] for i in range(len(iterable) - length + 1)]
+
+def make_combinations_oxide(element_list: List[str], max_num_elem: int) -> List[Tuple[str]]:
+    """
+    Function to make a list of elements combinations for oxides
+    Parameters
+    ----------
+    element_list : List of elements to be combined
+    max_num_elem : Maximum combination lenght.
+
+    Returns
+    -------
+    A list of each combination. ie:
+    ['Fe','La','Sr','Ba','O'] ->[['O', 'Fe'], ['O', 'La'], ['O', 'Sr'], 
+    ['O', 'Ba'], ['O', 'Fe', 'La'], ['O', 'La', 'Sr'], ['O', 'Sr', 'Ba'], 
+    ['O', 'Fe', 'La', 'Sr'], ['O', 'La', 'Sr', 'Ba'], ['O', 'Fe', 'La', 'Sr', 'Ba']]
+
+    """
+    specific_element = 'O'
+    # Create a sublist without the specific element
+    sublist = [x for x in element_list if x != specific_element]
+    combinations_oxide = []
+    # Generate combinations of different lengths
+    for length in range(1, max_num_elem):
+        current_combinations = get_combinations_oxide(sublist, length)
+    for combo in current_combinations:
+        combinations_oxide.append([specific_element,] + list(combo))
+    return combinations_oxide
+
 
 def rename_multicif(folder_path: str, provider: str = 'COD') -> None:
     """
@@ -174,7 +204,7 @@ def get_elements(name: str) -> List[str]:
     return Composition(name).chemical_system.split("-")
 
 
-def make_system_types(elements: List[str], size: int = None) -> List[str]:
+def make_system_types(elements: List[str], size: int = None, ceramic_mode: bool = False) -> List[str]:
     """
     Make "system-types" from a list of elements
 
@@ -191,7 +221,10 @@ def make_system_types(elements: List[str], size: int = None) -> List[str]:
     """
     if size is None:
         size = len(elements)
-    return [make_system(standarize(comb)) for comb in make_combinations(elements, size)]
+    if ceramic_mode:
+        return [make_system(standarize(comb)) for comb in make_combinations_oxide(elements, size)]
+    else:
+        return [make_system(standarize(comb)) for comb in make_combinations(elements, size)]
 
 
 def make_system(comp: str) -> str:
