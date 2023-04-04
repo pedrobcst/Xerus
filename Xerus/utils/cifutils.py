@@ -100,7 +100,7 @@ def make_combinations(element_list: List[str], max_num_elem: int) -> List[Tuple[
 def get_combinations_oxide(iterable, length):
     return [iterable[i:i+length] for i in range(len(iterable) - length + 1)]
 
-def make_combinations_oxides(element_list: List[str], max_num_elem: int) -> List[Tuple[str]]:
+def make_combinations_oxide(element_list: List[str], max_num_elem: int) -> List[Tuple[str]]:
     """
     Function to make a list of elements combinations for oxides
     Parameters
