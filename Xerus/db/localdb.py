@@ -200,7 +200,7 @@ class LocalDB:
                 self.check_and_download(combination, name = name)
         return self
 
-    def get_cifs_and_write(self, element_list : List[str], name: str, outfolder: str, maxn: int, max_oxy: int = 2) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def get_cifs_and_write(self, element_list : List[str], name: str, outfolder: str, maxn: int, max_oxy: int = 2, oxide:bool = False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
 
         Automatically receives a list of elements and make `system_types`.
@@ -236,7 +236,7 @@ class LocalDB:
             os.mkdir(outfolder)  # make folder if nto exist.
         folder_to_write = 'cifs/'
         final_path = os.path.join(outfolder, folder_to_write)
-        queries = make_system_types(element_list, maxn)
+        queries = make_system_types(element_list, maxn, ceramic_mode=oxide)
         self.check_all(queries, name = name)
 
         # check oxygen limit
