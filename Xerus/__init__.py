@@ -206,7 +206,8 @@ class XRay:
         self,
         ignore_provider: List[str] = None,
         ignore_comb: List[str] = None,
-        ignore_ids: List[str] = None,
+        ignore_ids: List[str] = None, 
+        ceramic:bool = False,
     ) -> XRay:
         """
         Get cifs from MongoDB and write to working folder.
@@ -227,7 +228,8 @@ class XRay:
             outfolder=self.working_folder,
             maxn=self.maxsys,
             max_oxy=self.max_oxy,
-            name = self.name
+            name = self.name,
+            oxide = ceramic
         )
         self.cif_info = cif_meta
         if ignore_provider is not None:
@@ -557,6 +559,7 @@ class XRay:
             ignore_provider=ignore_provider,
             ignore_comb=ignore_comb,
             ignore_ids=ignore_ids,
+            ceramic = is_ceramic,
         ).simulate_all(n_jobs=n_jobs).calculate_correlations(
             select_cifs=select_cifs, by_sys=systype
         )
