@@ -222,6 +222,8 @@ class LocalDB:
         max_oxy : int
             Maximum oxygen for `system_type`. For example `max_oxy` = 2, will allow up to binary oxides, however in case
             of len(element_list) > 2 and O is one the elements, the `system_type`: "A-B-O" will not be considered.
+        oxide : bool
+            if it is oxide, when ture, only oxide will be in query.
 
         Returns
         -------
