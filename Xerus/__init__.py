@@ -24,6 +24,7 @@ __version__ = '1.1b'
 
 import os
 from multiprocessing import Pool
+import concurrent.futures
 from typing import Any, List, Union
 
 import numpy as np
@@ -262,7 +263,7 @@ class XRay:
         self.cif_notsim.to_csv(name_out_notsim, index=False)
         return self
 
-    def simulate_all(self, n_jobs: int = -1):
+    def simulate_all(self, n_jobs: int = -1, timeout_value: int = 10):
         """
         Parallel simulation of XRD patterns using Modin (Ray backend)
         Parameters
@@ -290,10 +291,25 @@ class XRay:
             [f] + [tmin, tmax, step, working_folder, instr_params]
             for f in ciflist.full_path
         ]
-        with Pool(processes=n_jobs) as p:
-            paths = p.starmap(simulate_spectra, args)
-            p.close()
-            p.join()
+        with concurrent.futures.ProcessPoolExecutor(max_workers=n_jobs) as executor:
+            future_to_args = {executor.submit(simulate_spectra, *arg): arg for arg in args}
+            results=[]
+            for future in concurrent.futures.as_completed(future_to_args):
+                args = future_to_args[future]
+                try:
+                    result = future.result(timeout=timeout_value)
+                    results.append(result)
+                except concurrent.futures.TimeoutError:
+                    print(f'Task for file {args[0]} timed out after {timeout_value} seconds')
+                    results.append(None)
+                except Exception as e:
+                    print(f'Task for file {args[0]} raised an exception: {e}')
+                    results.append(None)
+        
+        paths = [None] * len(ciflist)
+        for i, result in enumerate(results):
+            if result is not None:
+                paths[i] = result 
         print("Done. Cleaning up GSASII files.")
         # Clean up
         files = [
@@ -304,9 +320,9 @@ class XRay:
         for file in files:
             # print(f"Cleaning up {file}")
             os.remove(file)
-        ciflist["simulated_files"] = [r[0] for r in paths]
-        ciflist["simulated_reflects"] = [r[1] for r in paths]
-        ciflist["sm_ran"] = [r[2] for r in paths]
+        ciflist["simulated_files"] = [r[0] if r is not None else None for r in paths]
+        ciflist["simulated_reflects"] = [r[1] if r is not None else None for r in paths]
+        ciflist["sm_ran"] = [r[2] if r is not None else False for r in paths]
         ciflist = ciflist[ciflist["sm_ran"]]
         ciflist.drop(["sm_ran"], axis=1, inplace=True)
         ciflist.reset_index(drop=True, inplace=True)
