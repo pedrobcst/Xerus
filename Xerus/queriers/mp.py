@@ -48,8 +48,12 @@ def make_cifs(data: pd.DataFrame, symprec: float = 1e-2, folder_path: os.PathLik
     if not os.path.isdir(folder_path):
         os.mkdir(folder_path)
     for mid, name, struc in zip(data['material_id'], data['formula_pretty'], data.structure):
-        writer = CifWriter(struc, symprec=symprec)
-        filename = folder_path + os.sep + name + "_" + "MP_" + mid + ".cif"
+        try:
+            writer = CifWriter(struc, symprec=symprec)
+            filename = folder_path + os.sep + name + "_" + "MP_" + mid + ".cif"
+        except:
+            print("Could not write {}".format(name))
+            continue
 
         if name != 'O2':
             writer.write_file(filename)
