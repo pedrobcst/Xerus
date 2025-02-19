@@ -29,7 +29,7 @@
 import pandas as pd
 import numpy as np
 import os
-
+import zipfile
 
 class DataExtension:
     """
@@ -144,7 +144,7 @@ class XYFile(DataExtension):
         self.tmin = np.round(xrd.theta.min(), 2)
         self.tmax = np.round(xrd.theta.max(), 2)
         self.step = np.round(xrd.theta.iat[1] - xrd.theta.iat[0], 4)
-        print("Sucessfuly read datafile {}".format(file))
+        print("Successfully read datafile {}".format(file))
 
 
 class CSVFile(DataExtension):
@@ -175,5 +175,27 @@ class CSVFile(DataExtension):
         self.tmin = np.round(xrd.theta.min(), 2)
         self.tmax = np.round(xrd.theta.max(), 2)
         self.step = np.round(xrd.theta.iat[1] - xrd.theta.iat[0], 4)
-        print("Sucessfuly read datafile {}".format(file))
+        print("Successfully read datafile {}".format(file))
 
+
+class RASXFile(DataExtension):
+
+    def __init__(self, fmt="rasx"):
+        super().__init__()
+        self.format = fmt
+
+    def read_data(self, file: os.PathLike) -> None:
+        try:
+            with zipfile.ZipFile(file, "r") as z:
+                with z.open(z.namelist()[0]) as f:
+                    xrd = pd.read_table(f, sep="\t", names=["theta", "int", "extra"])
+                    xrd = xrd.iloc[:, :2]
+        except Exception as e:
+            print("Error reading file: {}".format(e))
+            xrd = pd.read_table(file, sep=",", names=["theta", "int"])
+        xrd['filename'] = os.path.basename(file)
+        self.xrd_df = xrd
+        self.tmin = np.round(xrd.theta.min(), 2)
+        self.tmax = np.round(xrd.theta.max(), 2)
+        self.step = np.round(xrd.theta.iat[1] - xrd.theta.iat[0], 4)
+        print("Successfully read datafile {}".format(file))
