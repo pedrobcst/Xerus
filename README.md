@@ -129,6 +129,10 @@ please do the following:
 cd tests
 pytest -vvv
 ```
+or avoid additional dependencies you can try
+```
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -vvv
+```
 If all tests sucessfuly pass, _Xerus_ should be ready for use.
 
 > :warning: This process might take a while.
@@ -147,8 +151,10 @@ To start it, after installation do:
 ```python
 streamlit run app/app.py
 ```
-
-
+or determine the execution path
+```
+PYTHONPATH=$PWD streamlit run app/app.py
+```
 
 # Citing
 If you use _Xerus_ please __also__ cite the following papers:

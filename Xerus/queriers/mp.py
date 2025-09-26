@@ -79,7 +79,7 @@ def querymp(inc_eles: List[str], max_num_elem:int = 3, min_hull: float = 1e-4, w
     -------
     Returns a DataFrame with the queried data information with data is available for elements combination.
     '''
-    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical', 'fields_not_requested']
+    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical']
 
     mpr = MPRester(api_key)     
     datas = mpr.summary.search( chemsys=inc_eles,
