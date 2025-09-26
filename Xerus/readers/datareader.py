@@ -31,7 +31,8 @@ import os
 readers = {
     "xy": XYFile(),
     "ras": RASFile(),
-    "csv": CSVFile()
+    "csv": CSVFile(),
+    "rasx": RASXFile(),
 } # supported formats
 
 class DataReader:

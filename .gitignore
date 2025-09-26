@@ -153,3 +153,7 @@ fabric.properties
 
 #test file
 /Examples/Xerustest.ipynb
+
+#user file
+/results_tmp/
+/tmp/

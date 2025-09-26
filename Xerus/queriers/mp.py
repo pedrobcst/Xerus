@@ -48,8 +48,12 @@ def make_cifs(data: pd.DataFrame, symprec: float = 1e-2, folder_path: os.PathLik
     if not os.path.isdir(folder_path):
         os.mkdir(folder_path)
     for mid, name, struc in zip(data['material_id'], data['formula_pretty'], data.structure):
-        writer = CifWriter(struc, symprec=symprec)
-        filename = folder_path + os.sep + name + "_" + "MP_" + mid + ".cif"
+        try:
+            writer = CifWriter(struc, symprec=symprec)
+            filename = folder_path + os.sep + name + "_" + "MP_" + mid + ".cif"
+        except:
+            print("Could not write {}".format(name))
+            continue
 
         if name != 'O2':
             writer.write_file(filename)
@@ -75,7 +79,7 @@ def querymp(inc_eles: List[str], max_num_elem:int = 3, min_hull: float = 1e-4, w
     -------
     Returns a DataFrame with the queried data information with data is available for elements combination.
     '''
-    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical', 'fields_not_requested']
+    properties = ['formula_pretty',  'material_id',  'structure',  'energy_above_hull',  'theoretical']
 
     mpr = MPRester(api_key)     
     datas = mpr.summary.search( chemsys=inc_eles,

@@ -1,10 +1,9 @@
 import codecs
 import io
 import os
-from typing import List, Union
-
 import pandas as pd
-
+import zipfile
+from typing import List, Union
 from conf import AppSettings
 
 
@@ -21,13 +20,25 @@ def read_input(file: io.BytesIO) -> str:
     _type_
         Nothing. Save files into the temporary folder.
     """
-    stringio = io.StringIO(file.getvalue().decode("shift-jis"))
+    print(file)
+    if file.name.endswith(".rasx"):
+        with open(os.path.join(AppSettings.TMP_FOLDER, file.name), "wb") as f:
+            f.write(file.getvalue())
+        with zipfile.ZipFile(os.path.join(AppSettings.TMP_FOLDER, file.name), "r") as z:
+            with z.open(z.namelist()[0]) as f:
+                xrd = pd.read_table(f, sep="\t")
+        # Save the dataframe as a CSV to the TMP_FOLDER
+        csv_path = os.path.join(AppSettings.TMP_FOLDER, file.name.replace(".rasx", ".csv"))
+        xrd = xrd.iloc[:, :2]  # Keep only the first two columns
+        stringio = io.StringIO(xrd.to_csv(index=False))
+    else:
+        stringio = io.StringIO(file.getvalue().decode("shift-jis"))
 
-    # Save
+    # Save the string data with shift-jis encoding
     with codecs.open(os.path.join(AppSettings.TMP_FOLDER, file.name), "w", "shift-jis") as f:
         f.write(stringio.read())
 
-    # Return path
+    # Return the full path of the saved file
     return os.path.join(AppSettings.TMP_FOLDER, file.name)
 
 
